@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 public class RetryConfig {
 
     @Bean
-    public RegistryEventConsumer<Retry> customeRetryRegistryEventConsumer() {
+    public RegistryEventConsumer<Retry> customeLogRetryRegistryEventConsumer() {
         return new RegistryEventConsumer<>() {
             @Override
             public void onEntryAddedEvent(EntryAddedEvent<Retry> entryAddedEvent) {
@@ -36,7 +36,7 @@ public class RetryConfig {
     }
 
     @Bean
-    public EventConsumer<RetryEvent> retryEventConsumer() {
+    public EventConsumer<RetryEvent> logRetryEventConsumer() {
         return event -> log.info("{}:----- {}", event.getClass().getName(), event.toString());
     }
 

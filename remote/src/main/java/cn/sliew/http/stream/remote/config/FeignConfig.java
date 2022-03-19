@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Configuration
-@EnableFeignClients
+@EnableFeignClients(basePackages = "cn.sliew.http.stream.remote")
 public class FeignConfig {
 
     @Autowired
