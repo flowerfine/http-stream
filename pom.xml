@@ -19,6 +19,7 @@
         <module>dao</module>
         <module>remote</module>
         <module>akka</module>
+        <module>web</module>
     </modules>
 
     <properties>
