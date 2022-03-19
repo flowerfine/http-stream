@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sliew.http.stream.dao.mapper.jst.JstOrderMapper">
+
+    <resultMap id="BaseResultMap" type="cn.sliew.http.stream.dao.entity.jst.JstOrder">
+        <id column="id" property="id"/>
+        <result column="is_cod" property="isCod"/>
+        <result column="l_id" property="lId"/>
+        <result column="send_date" property="sendDate"/>
+        <result column="pay_date" property="payDate"/>
+        <result column="freight" property="freight"/>
+        <result column="receiver_address" property="receiverAddress"/>
+        <result column="receiver_district" property="receiverDistrict"/>
+        <result column="wms_co_id" property="wmsCoId"/>
+        <result column="logistics_company" property="logisticsCompany"/>
+        <result column="free_amount" property="freeAmount"/>
+        <result column="shop_name" property="shopName"/>
+        <result column="question_type" property="questionType"/>
+        <result column="outer_pay_id" property="outerPayId"/>
+        <result column="so_id" property="soId"/>
+        <result column="type" property="type"/>
+        <result column="order_from" property="orderFrom"/>
+        <result column="status" property="status"/>
+        <result column="pay_amount" property="payAmount"/>
+        <result column="shop_buyer_id" property="shopBuyerId"/>
+        <result column="shop_status" property="shopStatus"/>
+        <result column="receiver_mobile" property="receiverMobile"/>
+        <result column="order_date" property="orderDate"/>
+        <result column="question_desc" property="questionDesc"/>
+        <result column="receiver_city" property="receiverCity"/>
+        <result column="receiver_state" property="receiverState"/>
+        <result column="receiver_name" property="receiverName"/>
+        <result column="o_id" property="oId"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="co_id" property="coId"/>
+        <result column="pays" property="pays"/>
+        <result column="items" property="items"/>
+        <result column="remark" property="remark"/>
+        <result column="drp_co_id_from" property="drpCoIdFrom"/>
+        <result column="modified" property="modified"/>
+        <result column="labels" property="labels"/>
+        <result column="paid_amount" property="paidAmount"/>
+        <result column="currency" property="currency"/>
+        <result column="buyer_message" property="buyerMessage"/>
+        <result column="lc_id" property="lcId"/>
+        <result column="invoice_title" property="invoiceTitle"/>
+        <result column="invoice_type" property="invoiceType"/>
+        <result column="buyer_tax_no" property="buyerTaxNo"/>
+        <result column="creator_name" property="creatorName"/>
+        <result column="plan_delivery_date" property="planDeliveryDate"/>
+        <result column="node" property="node"/>
+        <result column="receiver_town" property="receiverTown"/>
+        <result column="drp_co_id_to" property="drpCoIdTo"/>
+        <result column="f_freight" property="fFreight"/>
+        <result column="shop_site" property="shopSite"/>
+        <result column="un_lid" property="unLid"/>
+        <result column="end_time" property="endTime"/>
+        <result column="receiver_country" property="receiverCountry"/>
+        <result column="receiver_zip" property="receiverZip"/>
+        <result column="seller_flag" property="sellerFlag"/>
+        <result column="modified_begin" property="modifiedBegin"/>
+        <result column="modified_end" property="modifiedEnd"/>
+        <result column="page_index" property="pageIndex"/>
+        <result column="page_size" property="pageSize"/>
+        <result column="creator" property="creator"/>
+        <result column="modifier" property="modifier"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <result column="gmt_modified" property="gmtModified"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, is_cod, l_id, send_date, pay_date, freight, receiver_address, receiver_district,
+        wms_co_id, logistics_company, free_amount, shop_name, question_type, outer_pay_id,
+        so_id, `type`, order_from, `status`, pay_amount, shop_buyer_id, shop_status, receiver_mobile,
+        order_date, question_desc, receiver_city, receiver_state, receiver_name, o_id, shop_id,
+        co_id, pays, items, remark, drp_co_id_from, modified, labels, paid_amount, currency,
+        buyer_message, lc_id, invoice_title, invoice_type, buyer_tax_no, creator_name, plan_delivery_date,
+        node, receiver_town, drp_co_id_to, f_freight, shop_site, un_lid, end_time, receiver_country,
+        receiver_zip, seller_flag, modified_begin, modified_end, page_index, page_size, creator,
+        modifier, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+    <select id="selectByOId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jst_orders_single_api
+        where o_id = #{oId}
+    </select>
+
+    <insert id="insertSelective"
+            parameterType="cn.sliew.http.stream.dao.entity.jst.JstOrder">
+        insert into jst_orders_single_api
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="isCod != null">
+                is_cod,
+            </if>
+            <if test="lId != null">
+                l_id,
+            </if>
+            <if test="sendDate != null">
+                send_date,
+            </if>
+            <if test="payDate != null">
+                pay_date,
+            </if>
+            <if test="freight != null">
+                freight,
+            </if>
+            <if test="receiverAddress != null">
+                receiver_address,
+            </if>
+            <if test="receiverDistrict != null">
+                receiver_district,
+            </if>
+            <if test="wmsCoId != null">
+                wms_co_id,
+            </if>
+            <if test="logisticsCompany != null">
+                logistics_company,
+            </if>
+            <if test="freeAmount != null">
+                free_amount,
+            </if>
+            <if test="shopName != null">
+                shop_name,
+            </if>
+            <if test="questionType != null">
+                question_type,
+            </if>
+            <if test="outerPayId != null">
+                outer_pay_id,
+            </if>
+            <if test="soId != null">
+                so_id,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="orderFrom != null">
+                order_from,
+            </if>
+            <if test="status != null">
+                `status`,
+            </if>
+            <if test="payAmount != null">
+                pay_amount,
+            </if>
+            <if test="shopBuyerId != null">
+                shop_buyer_id,
+            </if>
+            <if test="shopStatus != null">
+                shop_status,
+            </if>
+            <if test="receiverMobile != null">
+                receiver_mobile,
+            </if>
+            <if test="orderDate != null">
+                order_date,
+            </if>
+            <if test="questionDesc != null">
+                question_desc,
+            </if>
+            <if test="receiverCity != null">
+                receiver_city,
+            </if>
+            <if test="receiverState != null">
+                receiver_state,
+            </if>
+            <if test="receiverName != null">
+                receiver_name,
+            </if>
+            <if test="oId != null">
+                o_id,
+            </if>
+            <if test="shopId != null">
+                shop_id,
+            </if>
+            <if test="coId != null">
+                co_id,
+            </if>
+            <if test="pays != null">
+                pays,
+            </if>
+            <if test="items != null">
+                items,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="drpCoIdFrom != null">
+                drp_co_id_from,
+            </if>
+            <if test="modified != null">
+                modified,
+            </if>
+            <if test="labels != null">
+                labels,
+            </if>
+            <if test="paidAmount != null">
+                paid_amount,
+            </if>
+            <if test="currency != null">
+                currency,
+            </if>
+            <if test="buyerMessage != null">
+                buyer_message,
+            </if>
+            <if test="lcId != null">
+                lc_id,
+            </if>
+            <if test="invoiceTitle != null">
+                invoice_title,
+            </if>
+            <if test="invoiceType != null">
+                invoice_type,
+            </if>
+            <if test="buyerTaxNo != null">
+                buyer_tax_no,
+            </if>
+            <if test="creatorName != null">
+                creator_name,
+            </if>
+            <if test="planDeliveryDate != null">
+                plan_delivery_date,
+            </if>
+            <if test="node != null">
+                node,
+            </if>
+            <if test="receiverTown != null">
+                receiver_town,
+            </if>
+            <if test="drpCoIdTo != null">
+                drp_co_id_to,
+            </if>
+            <if test="fFreight != null">
+                f_freight,
+            </if>
+            <if test="shopSite != null">
+                shop_site,
+            </if>
+            <if test="unLid != null">
+                un_lid,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="receiverCountry != null">
+                receiver_country,
+            </if>
+            <if test="receiverZip != null">
+                receiver_zip,
+            </if>
+            <if test="sellerFlag != null">
+                seller_flag,
+            </if>
+            <if test="modifiedBegin != null">
+                modified_begin,
+            </if>
+            <if test="modifiedEnd != null">
+                modified_end,
+            </if>
+            <if test="pageIndex != null">
+                page_index,
+            </if>
+            <if test="pageSize != null">
+                page_size,
+            </if>
+            <if test="creator != null">
+                creator,
+            </if>
+            <if test="modifier != null">
+                modifier,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="isCod != null">
+                #{isCod},
+            </if>
+            <if test="lId != null">
+                #{lId},
+            </if>
+            <if test="sendDate != null">
+                #{sendDate},
+            </if>
+            <if test="payDate != null">
+                #{payDate},
+            </if>
+            <if test="freight != null">
+                #{freight},
+            </if>
+            <if test="receiverAddress != null">
+                #{receiverAddress},
+            </if>
+            <if test="receiverDistrict != null">
+                #{receiverDistrict},
+            </if>
+            <if test="wmsCoId != null">
+                #{wmsCoId},
+            </if>
+            <if test="logisticsCompany != null">
+                #{logisticsCompany},
+            </if>
+            <if test="freeAmount != null">
+                #{freeAmount},
+            </if>
+            <if test="shopName != null">
+                #{shopName},
+            </if>
+            <if test="questionType != null">
+                #{questionType},
+            </if>
+            <if test="outerPayId != null">
+                #{outerPayId},
+            </if>
+            <if test="soId != null">
+                #{soId},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="orderFrom != null">
+                #{orderFrom},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="payAmount != null">
+                #{payAmount},
+            </if>
+            <if test="shopBuyerId != null">
+                #{shopBuyerId},
+            </if>
+            <if test="shopStatus != null">
+                #{shopStatus},
+            </if>
+            <if test="receiverMobile != null">
+                #{receiverMobile},
+            </if>
+            <if test="orderDate != null">
+                #{orderDate},
+            </if>
+            <if test="questionDesc != null">
+                #{questionDesc},
+            </if>
+            <if test="receiverCity != null">
+                #{receiverCity},
+            </if>
+            <if test="receiverState != null">
+                #{receiverState},
+            </if>
+            <if test="receiverName != null">
+                #{receiverName},
+            </if>
+            <if test="oId != null">
+                #{oId},
+            </if>
+            <if test="shopId != null">
+                #{shopId},
+            </if>
+            <if test="coId != null">
+                #{coId},
+            </if>
+            <if test="pays != null">
+                #{pays},
+            </if>
+            <if test="items != null">
+                #{items},
+            </if>
+            <if test="remark != null">
+                #{remark},
+            </if>
+            <if test="drpCoIdFrom != null">
+                #{drpCoIdFrom},
+            </if>
+            <if test="modified != null">
+                #{modified},
+            </if>
+            <if test="labels != null">
+                #{labels},
+            </if>
+            <if test="paidAmount != null">
+                #{paidAmount},
+            </if>
+            <if test="currency != null">
+                #{currency},
+            </if>
+            <if test="buyerMessage != null">
+                #{buyerMessage},
+            </if>
+            <if test="lcId != null">
+                #{lcId},
+            </if>
+            <if test="invoiceTitle != null">
+                #{invoiceTitle},
+            </if>
+            <if test="invoiceType != null">
+                #{invoiceType},
+            </if>
+            <if test="buyerTaxNo != null">
+                #{buyerTaxNo},
+            </if>
+            <if test="creatorName != null">
+                #{creatorName},
+            </if>
+            <if test="planDeliveryDate != null">
+                #{planDeliveryDate},
+            </if>
+            <if test="node != null">
+                #{node},
+            </if>
+            <if test="receiverTown != null">
+                #{receiverTown},
+            </if>
+            <if test="drpCoIdTo != null">
+                #{drpCoIdTo},
+            </if>
+            <if test="fFreight != null">
+                #{fFreight},
+            </if>
+            <if test="shopSite != null">
+                #{shopSite},
+            </if>
+            <if test="unLid != null">
+                #{unLid},
+            </if>
+            <if test="endTime != null">
+                #{endTime},
+            </if>
+            <if test="receiverCountry != null">
+                #{receiverCountry},
+            </if>
+            <if test="receiverZip != null">
+                #{receiverZip},
+            </if>
+            <if test="sellerFlag != null">
+                #{sellerFlag},
+            </if>
+            <if test="modifiedBegin != null">
+                #{modifiedBegin},
+            </if>
+            <if test="modifiedEnd != null">
+                #{modifiedEnd},
+            </if>
+            <if test="pageIndex != null">
+                #{pageIndex},
+            </if>
+            <if test="pageSize != null">
+                #{pageSize},
+            </if>
+            <if test="creator != null">
+                #{creator},
+            </if>
+            <if test="modifier != null">
+                #{modifier},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="cn.sliew.http.stream.dao.entity.jst.JstOrder">
+        update jst_orders_single_api
+        <set>
+            <if test="isCod != null">
+                is_cod = #{isCod},
+            </if>
+            <if test="lId != null">
+                l_id = #{lId},
+            </if>
+            <if test="sendDate != null">
+                send_date = #{sendDate},
+            </if>
+            <if test="payDate != null">
+                pay_date = #{payDate},
+            </if>
+            <if test="freight != null">
+                freight = #{freight},
+            </if>
+            <if test="receiverAddress != null">
+                receiver_address = #{receiverAddress},
+            </if>
+            <if test="receiverDistrict != null">
+                receiver_district = #{receiverDistrict},
+            </if>
+            <if test="wmsCoId != null">
+                wms_co_id = #{wmsCoId},
+            </if>
+            <if test="logisticsCompany != null">
+                logistics_company = #{logisticsCompany},
+            </if>
+            <if test="freeAmount != null">
+                free_amount = #{freeAmount},
+            </if>
+            <if test="shopName != null">
+                shop_name = #{shopName},
+            </if>
+            <if test="questionType != null">
+                question_type = #{questionType},
+            </if>
+            <if test="outerPayId != null">
+                outer_pay_id = #{outerPayId},
+            </if>
+            <if test="soId != null">
+                so_id = #{soId},
+            </if>
+            <if test="type != null">
+                `type` = #{type},
+            </if>
+            <if test="orderFrom != null">
+                order_from = #{orderFrom},
+            </if>
+            <if test="status != null">
+                `status` = #{status},
+            </if>
+            <if test="payAmount != null">
+                pay_amount = #{payAmount},
+            </if>
+            <if test="shopBuyerId != null">
+                shop_buyer_id = #{shopBuyerId},
+            </if>
+            <if test="shopStatus != null">
+                shop_status = #{shopStatus},
+            </if>
+            <if test="receiverMobile != null">
+                receiver_mobile = #{receiverMobile},
+            </if>
+            <if test="orderDate != null">
+                order_date = #{orderDate},
+            </if>
+            <if test="questionDesc != null">
+                question_desc = #{questionDesc},
+            </if>
+            <if test="receiverCity != null">
+                receiver_city = #{receiverCity},
+            </if>
+            <if test="receiverState != null">
+                receiver_state = #{receiverState},
+            </if>
+            <if test="receiverName != null">
+                receiver_name = #{receiverName},
+            </if>
+            <if test="oId != null">
+                o_id = #{oId},
+            </if>
+            <if test="shopId != null">
+                shop_id = #{shopId},
+            </if>
+            <if test="coId != null">
+                co_id = #{coId},
+            </if>
+            <if test="pays != null">
+                pays = #{pays},
+            </if>
+            <if test="items != null">
+                items = #{items},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="drpCoIdFrom != null">
+                drp_co_id_from = #{drpCoIdFrom},
+            </if>
+            <if test="modified != null">
+                modified = #{modified},
+            </if>
+            <if test="labels != null">
+                labels = #{labels},
+            </if>
+            <if test="paidAmount != null">
+                paid_amount = #{paidAmount},
+            </if>
+            <if test="currency != null">
+                currency = #{currency},
+            </if>
+            <if test="buyerMessage != null">
+                buyer_message = #{buyerMessage},
+            </if>
+            <if test="lcId != null">
+                lc_id = #{lcId},
+            </if>
+            <if test="invoiceTitle != null">
+                invoice_title = #{invoiceTitle},
+            </if>
+            <if test="invoiceType != null">
+                invoice_type = #{invoiceType},
+            </if>
+            <if test="buyerTaxNo != null">
+                buyer_tax_no = #{buyerTaxNo},
+            </if>
+            <if test="creatorName != null">
+                creator_name = #{creatorName},
+            </if>
+            <if test="planDeliveryDate != null">
+                plan_delivery_date = #{planDeliveryDate},
+            </if>
+            <if test="node != null">
+                node = #{node},
+            </if>
+            <if test="receiverTown != null">
+                receiver_town = #{receiverTown},
+            </if>
+            <if test="drpCoIdTo != null">
+                drp_co_id_to = #{drpCoIdTo},
+            </if>
+            <if test="fFreight != null">
+                f_freight = #{fFreight},
+            </if>
+            <if test="shopSite != null">
+                shop_site = #{shopSite},
+            </if>
+            <if test="unLid != null">
+                un_lid = #{unLid},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="receiverCountry != null">
+                receiver_country = #{receiverCountry},
+            </if>
+            <if test="receiverZip != null">
+                receiver_zip = #{receiverZip},
+            </if>
+            <if test="sellerFlag != null">
+                seller_flag = #{sellerFlag},
+            </if>
+            <if test="modifiedBegin != null">
+                modified_begin = #{modifiedBegin},
+            </if>
+            <if test="modifiedEnd != null">
+                modified_end = #{modifiedEnd},
+            </if>
+            <if test="pageIndex != null">
+                page_index = #{pageIndex},
+            </if>
+            <if test="pageSize != null">
+                page_size = #{pageSize},
+            </if>
+            <if test="modifier != null">
+                modifier = #{modifier},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sliew.http.stream.dao.mapper.job.JobSyncOffsetMapper">
+
+    <resultMap id="BaseResultMap" type="cn.sliew.http.stream.dao.entity.job.JobSyncOffset">
+        <id column="id" property="id"/>
+        <result column="method" property="method"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="creator" property="creator"/>
+        <result column="modifier" property="modifier"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <result column="gmt_modified" property="gmtModified"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, `method`, start_time, end_time,
+        creator, modifier, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+    <select id="selectByMethod" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from job_sync_offset
+        where `method` = #{method}
+    </select>
+
+    <insert id="insertSelective"
+            parameterType="cn.sliew.http.stream.dao.entity.job.JobSyncOffset">
+        insert into job_sync_offset
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="method != null">
+                `method`,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="creator != null">
+                creator,
+            </if>
+            <if test="modifier != null">
+                modifier,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="method != null">
+                #{method},
+            </if>
+            <if test="startTime != null">
+                #{startTime},
+            </if>
+            <if test="endTime != null">
+                #{endTime},
+            </if>
+            <if test="creator != null">
+                #{creator},
+            </if>
+            <if test="modifier != null">
+                #{modifier},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="cn.sliew.http.stream.dao.entity.job.JobSyncOffset">
+        update job_sync_offset
+        <set>
+            <if test="method != null">
+                `method` = #{method},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="modifier != null">
+                modifier = #{modifier},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.remote;
+package cn.sliew.http.stream.remote.config;
 
 import feign.codec.Decoder;
 import feign.codec.Encoder;
