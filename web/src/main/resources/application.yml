@@ -1,0 +1,90 @@
+server:
+  port: 8080
+#  servlet.context-path: /${spring.application.name}
+
+spring:
+  profiles.active: local, feign, resilience4j
+  application.name: demo-job
+  main.banner-mode: log
+  jackson.default-property-inclusion: non_null
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://127.0.0.1:3306/data_service?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 30
+      idle-timeout: 30000
+      max-lifetime: 900000
+      validation-timeout: 1000
+      connection-timeout: 10000
+      connection-test-query: SELECT 1
+      auto-commit: true
+      pool-name: HikariCP
+
+mybatis-plus:
+  mapper-locations: "classpath:mybatis/mapper/**/*.xml"
+  global-config:
+    field-strategy: 1
+    db-column-underline: true
+    banner: off
+
+feign.client.config:
+  default:
+    connectTimeout: 5000
+    readTimeout: 5000
+    loggerLevel: NONE
+#    loggerLevel: full
+
+management:
+  endpoints.web.exposure.include: "*"
+  health:
+    circuitbreakers.enabled: true
+    ratelimiters.enabled: true
+  metrics:
+    tags.application: ${spring.application.name}
+    percentiles-histogram:
+      resilience4j.circuitbreaker.calls: true
+
+resilience4j.ratelimiter:
+  configs:
+    default:
+      limitRefreshPeriod: 1m
+      limitForPeriod: 20
+      timeoutDuration: 10s
+      subscribeForEvents: true
+      allowHealthIndicatorToFail: true
+      eventConsumerBufferSize: 16
+      writableStackTraceEnabled: true
+      registerHealthIndicator: true
+  instances:
+    default:
+      baseConfig: default
+    orders_single_query:
+      baseConfig: default
+      limitForPeriod: 1
+      limitRefreshPeriod: 1ms
+      timeoutDuration: 10m
+
+resilience4j.retry:
+  configs:
+    default:
+      waitDuration: 300ms
+      maxAttempts: 2
+      eventConsumerBufferSize: 16
+      retryExceptions:
+        - io.github.resilience4j.ratelimiter.RequestNotPermitted
+        - java.util.concurrent.TimeoutException
+        - java.io.IOException
+        - java.net.SocketTimeoutException
+        - java.net.SocketException
+        - feign.RetryableException
+  instances:
+    default:
+      baseConfig: default
+    jst_client:
+      baseConfig: default
+      maxAttempts: 16
+      waitDuration: 1s
