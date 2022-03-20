@@ -1,4 +1,4 @@
-CREATE TABLE `jst_sync_offset`
+CREATE TABLE `job_sync_offset`
 (
     `id`           bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
     `method`       varchar(64)         NOT NULL COMMENT '接口名称',

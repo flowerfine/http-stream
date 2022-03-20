@@ -10,5 +10,5 @@ public interface JobSyncOffsetMapper extends BaseMapper<JobSyncOffset> {
 
     int insertSelective(JobSyncOffset record);
 
-    int updateByPrimaryKeySelective(JobSyncOffset record);
+    int updateByMethod(JobSyncOffset record);
 }

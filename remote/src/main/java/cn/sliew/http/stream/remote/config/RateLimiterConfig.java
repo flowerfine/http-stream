@@ -7,7 +7,6 @@ import io.github.resilience4j.core.registry.EntryReplacedEvent;
 import io.github.resilience4j.core.registry.RegistryEventConsumer;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.event.RateLimiterOnFailureEvent;
-import io.github.resilience4j.ratelimiter.event.RateLimiterOnSuccessEvent;
 import io.github.resilience4j.retry.event.RetryEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -43,15 +42,7 @@ public class RateLimiterConfig {
     }
 
     private void registerEventConsumer(RateLimiter.EventPublisher eventPublisher) {
-        eventPublisher.onSuccess(new SuccessEventConsumer());
         eventPublisher.onFailure(new FailureEventConsumer());
-    }
-
-    private class SuccessEventConsumer implements EventConsumer<RateLimiterOnSuccessEvent> {
-        @Override
-        public void consumeEvent(RateLimiterOnSuccessEvent event) {
-            log.error("event: {}", event);
-        }
     }
 
     private class FailureEventConsumer implements EventConsumer<RateLimiterOnFailureEvent> {

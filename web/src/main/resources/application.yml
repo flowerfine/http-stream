@@ -3,8 +3,8 @@ server:
 #  servlet.context-path: /${spring.application.name}
 
 spring:
-  profiles.active: local, feign, resilience4j
-  application.name: demo-job
+  profiles.active: local
+  application.name: http-stream
   main.banner-mode: log
   jackson.default-property-inclusion: non_null
   datasource:

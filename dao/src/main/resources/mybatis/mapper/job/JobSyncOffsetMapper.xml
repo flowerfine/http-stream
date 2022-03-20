@@ -65,13 +65,10 @@
         </trim>
     </insert>
 
-    <update id="updateByPrimaryKeySelective"
+    <update id="updateByMethod"
             parameterType="cn.sliew.http.stream.dao.entity.job.JobSyncOffset">
         update job_sync_offset
         <set>
-            <if test="method != null">
-                `method` = #{method},
-            </if>
             <if test="startTime != null">
                 start_time = #{startTime},
             </if>
@@ -82,6 +79,6 @@
                 modifier = #{modifier},
             </if>
         </set>
-        where id = #{id}
+        where `method` = #{method}
     </update>
 </mapper>
