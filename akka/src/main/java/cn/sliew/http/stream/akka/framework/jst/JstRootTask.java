@@ -45,7 +45,7 @@ public class JstRootTask implements RootTask<JobSyncOffset, JstSubTask> {
         if (optional.isPresent() == false) {
             return Collections.emptyList();
         }
-        List<Pair<Date, Date>> pairs = SyncOffsetHelper.split(startTime, endTime, optional.get(), 15);
+        List<Pair<Date, Date>> pairs = SyncOffsetHelper.split(startTime, endTime, optional.get(), 100);
 
         List<JstSubTask> subTasks = new ArrayList<>(pairs.size());
         for (int i = 0; i < pairs.size(); i++) {

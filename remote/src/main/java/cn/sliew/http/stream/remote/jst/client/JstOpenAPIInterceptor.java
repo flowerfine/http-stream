@@ -36,8 +36,8 @@ public class JstOpenAPIInterceptor implements RequestInterceptor {
         requestTemplate.query("token", token);
         requestTemplate.query("ts", ts);
         requestTemplate.query("sign", sign);
-        if (log.isDebugEnabled()) {
-            log.debug("{} ---> {}", method, new String(requestTemplate.body()));
+        if (log.isTraceEnabled()) {
+            log.trace("{} ---> {}", method, new String(requestTemplate.body()));
         }
     }
 }

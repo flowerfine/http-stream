@@ -54,8 +54,10 @@ public class OrderJobProcessor extends AbstractJobProcessor<JstRootTask, JstSubT
     private JstResult<OrdersSingleDO> queryJst(JobContext<JobSyncOffset, JstRootTask, JstSubTask> context, OrdersSingleQuery query) {
         JstResult<OrdersSingleDO> jstResult = jstRemoteService.ordersSingleQuery(query);
         if (jstResult.isSuccess()) {
-            log.debug("请求聚水潭接口返回结果 method: {}, query: {}, page_index: {}, page_size: {}, data_count: {}, page_count: {}",
-                    context.getJobName(), JacksonUtil.toJsonString(query), jstResult.getPageIndex(), jstResult.getPageSize(), jstResult.getDataCount(), jstResult.getPageCount());
+            if (log.isTraceEnabled()) {
+                log.debug("请求聚水潭接口返回结果 method: {}, query: {}, page_index: {}, page_size: {}, data_count: {}, page_count: {}",
+                        context.getJobName(), JacksonUtil.toJsonString(query), jstResult.getPageIndex(), jstResult.getPageSize(), jstResult.getDataCount(), jstResult.getPageCount());
+            }
             return jstResult;
         }
         throw new RuntimeException(jstResult.getMsg());

@@ -24,7 +24,7 @@ public abstract class AbstractJobProcessor<Root extends RootTask, Sub extends Su
     public ProcessResult reduce(JobContext<SyncOffset, Root, Sub> context, ProcessResult result) {
         if (result.isSuccess()) {
             SubTask subTask = result.getSubTask();
-            log.debug("{} 子任务处理成功: {}! 子任务 id: {}, 子任务: {}", context.getJobName(), result.getMessage(),
+            log.debug("{} 子任务处理成功! 子任务 id: {}, 子任务: {}", context.getJobName(),
                     subTask.getIdentifier(), JacksonUtil.toJsonString(subTask));
             context.updateSyncOffset((Sub) result.getSubTask());
             return ProcessResult.success(result.getSubTask());

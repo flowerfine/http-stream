@@ -6,7 +6,6 @@ import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
 import akka.event.Logging;
 import akka.japi.Pair;
-import akka.japi.pf.PFBuilder;
 import akka.stream.*;
 import akka.stream.javadsl.*;
 import cn.sliew.http.stream.akka.framework.ProcessResult;
@@ -63,29 +62,19 @@ public class OrderStreamJob implements ApplicationListener<ContextClosedEvent> {
                                 }));
 
         Pair<UniqueKillSwitch, CompletionStage<Done>> pair = source.via(subTasks)
-                .log("stream logginng")
+                .log(context.getJobName())
                 .withAttributes(
                         Attributes.createLogLevels(
                                 Logging.DebugLevel(), // onElement
-                                Logging.InfoLevel(), // onFinish
-                                Logging.ErrorLevel()  //onFailure
+                                Logging.InfoLevel(),  // onFinish
+                                Logging.ErrorLevel()  // onFailure
                         )
                 )
-                .recover(new PFBuilder<Throwable, ProcessResult>()
-                        .match(Throwable.class, throwable -> ProcessResult.failure(null, throwable))
-                        .build())
                 .toMat(Sink.foreach(result -> processor.reduce(context, result)), Keep.both())
                 .run(actorSystem);
 
         killSwitch = pair.first();
         CompletionStage<Done> future = pair.second();
-        future.whenComplete((done, throwable) -> {
-            if (throwable != null) {
-                log.error("执行异常!", throwable);
-            } else {
-                log.debug("执行结束!");
-            }
-        });
         future.toCompletableFuture().get();
     }
 
