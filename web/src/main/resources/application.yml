@@ -65,7 +65,7 @@ resilience4j.ratelimiter:
     orders_single_query:
       baseConfig: default
       limitForPeriod: 1
-      limitRefreshPeriod: 1ms
+      limitRefreshPeriod: 1s
       timeoutDuration: 10m
 
 resilience4j.retry:
