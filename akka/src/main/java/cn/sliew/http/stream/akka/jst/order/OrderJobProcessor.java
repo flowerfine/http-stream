@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.akka.framework.jst.order;
+package cn.sliew.http.stream.akka.jst.order;
 
 import akka.Done;
 import akka.NotUsed;
@@ -6,11 +6,11 @@ import akka.actor.typed.ActorSystem;
 import akka.actor.typed.SpawnProtocol;
 import akka.japi.Pair;
 import akka.stream.javadsl.Source;
-import cn.sliew.http.stream.akka.framework.AbstractJobProcessor;
+import cn.sliew.http.stream.akka.framework.DefaultJobProcessor;
 import cn.sliew.http.stream.akka.framework.JobContext;
 import cn.sliew.http.stream.akka.framework.ProcessResult;
-import cn.sliew.http.stream.akka.framework.jst.JstRootTask;
-import cn.sliew.http.stream.akka.framework.jst.JstSubTask;
+import cn.sliew.http.stream.akka.jst.JstRootTask;
+import cn.sliew.http.stream.akka.jst.JstSubTask;
 import cn.sliew.http.stream.akka.util.BeanUtil;
 import cn.sliew.http.stream.akka.util.JacksonUtil;
 import cn.sliew.http.stream.dao.entity.job.JobSyncOffset;
@@ -31,7 +31,7 @@ import java.util.concurrent.CompletionStage;
 
 @Slf4j
 @Component
-public class OrderJobProcessor extends AbstractJobProcessor<JstRootTask, JstSubTask, JobSyncOffset> {
+public class OrderJobProcessor extends DefaultJobProcessor<JstRootTask, JstSubTask, JobSyncOffset> {
 
     private final JstRemoteService jstRemoteService;
     private final JstOrderMapper jstOrderMapper;

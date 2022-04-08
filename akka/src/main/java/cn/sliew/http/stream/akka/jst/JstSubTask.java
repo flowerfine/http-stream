@@ -1,19 +1,17 @@
-package cn.sliew.http.stream.akka.framework.jst;
+package cn.sliew.http.stream.akka.jst;
 
+import cn.sliew.http.stream.akka.framework.ProcessResult;
 import cn.sliew.http.stream.akka.framework.SubTask;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.concurrent.CompletableFuture;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class JstSubTask implements SubTask {
+public abstract class JstSubTask<Context extends JstJobContext> implements SubTask<Context> {
 
     private Long identifier;
 
@@ -28,4 +26,8 @@ public class JstSubTask implements SubTask {
         return identifier;
     }
 
+    @Override
+    public CompletableFuture<ProcessResult> execute(Context context) {
+        return null;
+    }
 }

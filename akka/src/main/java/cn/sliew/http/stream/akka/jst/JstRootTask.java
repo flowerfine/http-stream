@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.akka.framework.jst;
+package cn.sliew.http.stream.akka.jst;
 
 import akka.japi.Pair;
 import cn.sliew.http.stream.akka.framework.RootTask;
@@ -11,7 +11,7 @@ import java.time.Duration;
 import java.util.*;
 
 @Slf4j
-public class JstRootTask implements RootTask<JobSyncOffset, JstSubTask> {
+public class JstRootTask implements RootTask<JstJobContext, JstSubTask> {
 
     /**
      * 默认的时间梯度为: 1h, 30min, 15min, 5min, 2min, 1min, 30s, 15s, 10s, 5s
@@ -29,15 +29,9 @@ public class JstRootTask implements RootTask<JobSyncOffset, JstSubTask> {
             Duration.ofSeconds(5L));
 
     @Override
-    public boolean supportSplit(JobSyncOffset jstSyncOffset) {
-        Date startTime = jstSyncOffset.getEndTime();
-        Date endTime = DateUtil.lastSecond();
-        return gradients.stream().anyMatch(gradient -> SyncOffsetHelper.supportSplit(startTime, endTime, gradient));
-    }
-
-    @Override
-    public List<JstSubTask> split(JobSyncOffset jstSyncOffset) {
-        Date startTime = jstSyncOffset.getEndTime();
+    public List<JstSubTask> split(JstJobContext context) {
+        JobSyncOffset syncOffset = context.getSyncOffset(this);
+        Date startTime = syncOffset.getEndTime();
         Date endTime = DateUtil.lastSecond();
         Optional<Duration> optional = gradients.stream()
                 .filter(gradient -> SyncOffsetHelper.supportSplit(startTime, endTime, gradient))
@@ -54,4 +48,5 @@ public class JstRootTask implements RootTask<JobSyncOffset, JstSubTask> {
         }
         return subTasks;
     }
+
 }

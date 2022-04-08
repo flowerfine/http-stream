@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.akka.framework.jst;
+package cn.sliew.http.stream.akka.jst;
 
 import lombok.Getter;
 

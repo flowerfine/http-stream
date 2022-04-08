@@ -1,7 +1,7 @@
-package cn.sliew.http.stream.akka.framework.jst.order;
+package cn.sliew.http.stream.akka.jst.order;
 
-import cn.sliew.http.stream.akka.framework.jst.JstJobContext;
-import cn.sliew.http.stream.akka.framework.jst.JstMethodEnum;
+import cn.sliew.http.stream.akka.jst.JstJobContext;
+import cn.sliew.http.stream.akka.jst.JstMethodEnum;
 import cn.sliew.http.stream.akka.util.DateUtil;
 import cn.sliew.http.stream.dao.entity.job.JobSyncOffset;
 import cn.sliew.http.stream.dao.mapper.job.JobSyncOffsetMapper;

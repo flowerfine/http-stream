@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.akka.framework.jst.order;
+package cn.sliew.http.stream.akka.jst.order;
 
 import akka.Done;
 import akka.NotUsed;
@@ -9,8 +9,8 @@ import akka.japi.Pair;
 import akka.stream.*;
 import akka.stream.javadsl.*;
 import cn.sliew.http.stream.akka.framework.ProcessResult;
-import cn.sliew.http.stream.akka.framework.jst.JstRootTask;
-import cn.sliew.http.stream.akka.framework.jst.JstSubTask;
+import cn.sliew.http.stream.akka.jst.JstRootTask;
+import cn.sliew.http.stream.akka.jst.JstSubTask;
 import cn.sliew.http.stream.dao.mapper.job.JobSyncOffsetMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;

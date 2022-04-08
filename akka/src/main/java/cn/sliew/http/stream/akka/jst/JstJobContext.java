@@ -1,14 +1,21 @@
-package cn.sliew.http.stream.akka.framework.jst;
+package cn.sliew.http.stream.akka.jst;
 
-import cn.sliew.http.stream.akka.framework.JobContext;
+import akka.actor.typed.ActorSystem;
+import cn.sliew.http.stream.akka.framework.batch.BatchJobContext;
+import cn.sliew.http.stream.akka.framework.incremental.IncrementalJobContext;
 import cn.sliew.http.stream.dao.entity.job.JobSyncOffset;
 import cn.sliew.http.stream.dao.mapper.job.JobSyncOffsetMapper;
+import io.micrometer.core.instrument.MeterRegistry;
 
-public abstract class JstJobContext implements JobContext<JobSyncOffset, JstRootTask, JstSubTask> {
+import java.util.Properties;
+
+public abstract class JstJobContext extends BatchJobContext<JstRootTask, JstSubTask>
+        implements IncrementalJobContext<JobSyncOffset, JstRootTask, JstSubTask> {
 
     protected final JobSyncOffsetMapper jobSyncOffsetMapper;
 
-    public JstJobContext(JobSyncOffsetMapper jobSyncOffsetMapper) {
+    public JstJobContext(String jobName, Properties properties, MeterRegistry meterRegistry, ActorSystem actorSystem, JobSyncOffsetMapper jobSyncOffsetMapper) {
+        super(jobName, properties, meterRegistry, actorSystem);
         this.jobSyncOffsetMapper = jobSyncOffsetMapper;
     }
 

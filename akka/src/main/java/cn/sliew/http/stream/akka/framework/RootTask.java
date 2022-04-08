@@ -2,10 +2,9 @@ package cn.sliew.http.stream.akka.framework;
 
 import java.util.List;
 
-public interface RootTask<SyncOffset, Task extends SubTask> {
+public interface RootTask<Context extends JobContext, Sub extends SubTask> {
 
-    boolean supportSplit(SyncOffset offset);
-
-    List<Task> split(SyncOffset offset);
-
+    List<Sub> split(Context context);
 }
+
+
