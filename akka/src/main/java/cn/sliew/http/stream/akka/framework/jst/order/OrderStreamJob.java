@@ -48,7 +48,7 @@ public class OrderStreamJob implements ApplicationListener<ContextClosedEvent> {
                 Flow.fromGraph(
                         GraphDSL.create(
                                 b -> {
-                                    int concurrency = 10;
+                                    int concurrency = 2;
                                     UniformFanOutShape<JstSubTask, JstSubTask> partition =
                                             b.add(Partition.create(concurrency, subTask -> Math.toIntExact(subTask.getIdentifier()) % concurrency));
                                     UniformFanInShape<ProcessResult, ProcessResult> merge =
