@@ -35,28 +35,4 @@ public enum  SyncOffsetHelper {
         }
         return pairs;
     }
-
-    public static Date addDurationUntilNow(Date date, List<Duration> gradients) {
-        LocalDateTime localDateTime = DateUtil.toLocalDateTime(date);
-        LocalDateTime now = LocalDateTime.now().minusSeconds(1L);
-        for (Duration gradient : gradients) {
-            LocalDateTime nextLocalDateTime = localDateTime.plus(gradient);
-            if (nextLocalDateTime.isBefore(now)) {
-                return DateUtil.toDate(nextLocalDateTime);
-            }
-        }
-        return null;
-    }
-
-    public static Date addDurationUntilLastFiveMinutes(Date date, List<Duration> gradients) {
-        LocalDateTime localDateTime = DateUtil.toLocalDateTime(date);
-        LocalDateTime now = LocalDateTime.now().minusSeconds(5L);
-        for (Duration gradient : gradients) {
-            LocalDateTime nextLocalDateTime = localDateTime.plus(gradient);
-            if (nextLocalDateTime.isBefore(now)) {
-                return DateUtil.toDate(nextLocalDateTime);
-            }
-        }
-        return null;
-    }
 }
