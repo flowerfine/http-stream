@@ -13,7 +13,6 @@ import cn.sliew.http.stream.akka.framework.jst.JstRootTask;
 import cn.sliew.http.stream.akka.framework.jst.JstSubTask;
 import cn.sliew.http.stream.dao.mapper.job.JobSyncOffsetMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
@@ -24,14 +23,17 @@ import java.util.concurrent.CompletionStage;
 @Component
 public class OrderStreamJob implements ApplicationListener<ContextClosedEvent> {
 
-    @Autowired
     private ActorSystem<SpawnProtocol.Command> actorSystem;
-    @Autowired
     private OrderJobProcessor processor;
-    @Autowired
     private JobSyncOffsetMapper jobSyncOffsetMapper;
 
     private volatile UniqueKillSwitch killSwitch;
+
+    public OrderStreamJob(ActorSystem<SpawnProtocol.Command> actorSystem, OrderJobProcessor processor, JobSyncOffsetMapper jobSyncOffsetMapper) {
+        this.actorSystem = actorSystem;
+        this.processor = processor;
+        this.jobSyncOffsetMapper = jobSyncOffsetMapper;
+    }
 
     public void execute() throws Exception {
         OrderJobContext context = new OrderJobContext(jobSyncOffsetMapper);

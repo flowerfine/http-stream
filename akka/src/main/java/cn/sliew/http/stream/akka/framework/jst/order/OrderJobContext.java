@@ -23,8 +23,8 @@ class OrderJobContext extends JstJobContext {
     protected JobSyncOffset initSyncOffset() {
         JobSyncOffset syncOffset = new JobSyncOffset();
         syncOffset.setMethod(getJobName());
-        syncOffset.setStartTime(DateUtil.toDate(LocalDateTime.of(2022, 1, 1, 0, 0, 0)));
-        syncOffset.setEndTime(DateUtil.toDate(LocalDateTime.of(2022, 1, 2, 0, 0, 0)));
+        syncOffset.setStartTime(DateUtil.toDate(LocalDateTime.of(2021, 12, 31, 0, 0, 0)));
+        syncOffset.setEndTime(DateUtil.toDate(LocalDateTime.of(2022, 1, 1, 0, 0, 0)));
         syncOffset.setCreator("sync-task");
         syncOffset.setModifier("sync-task");
         jobSyncOffsetMapper.insertSelective(syncOffset);

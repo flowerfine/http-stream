@@ -19,3 +19,16 @@ But how to sync data through http is also a big problem for developers.
 * ratelimiter. qps(query per second) or concurrency.
 * network failure. not threaten or caution, frequent network failure would never disappear.
 
+
+
+
+
+
+
+响应式分页
+
+[Daily Reactive: Pagination](https://bsideup.github.io/posts/daily_reactive/pagination/)。
+
+[Rethinking Streaming Workloads with Akka Streams: Part II](https://blog.colinbreck.com/rethinking-streaming-workloads-with-akka-streams-part-ii/)。
+
+[PagedSource](https://github.com/akka/akka-stream-contrib/blob/main/src/main/scala/akka/stream/contrib/PagedSource.scala)。

@@ -17,7 +17,7 @@ public class JstRootTask implements RootTask<JobSyncOffset, JstSubTask> {
      * 默认的时间梯度为: 1h, 30min, 15min, 5min, 2min, 1min, 30s, 15s, 10s, 5s
      * 其中 1h, 30min, 15min, 5min 为了处理历史数据, 2min, 1min, 30s, 15s, 10s, 5s 是为了实时数据
      */
-    private final List<Duration> gradients = Arrays.asList(Duration.ofHours(1L),
+    private final List<Duration> gradients = Arrays.asList(Duration.ofDays(5L),
             Duration.ofMinutes(30L),
             Duration.ofMinutes(15L),
             Duration.ofMinutes(5L),
