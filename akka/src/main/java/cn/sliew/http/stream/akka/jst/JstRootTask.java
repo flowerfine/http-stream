@@ -11,7 +11,7 @@ import java.time.Duration;
 import java.util.*;
 
 @Slf4j
-public class JstRootTask implements RootTask<JstJobContext, JstSubTask> {
+public abstract class JstRootTask implements RootTask<JstJobContext, JstSubTask> {
 
     /**
      * 默认的时间梯度为: 1h, 30min, 15min, 5min, 2min, 1min, 30s, 15s, 10s, 5s
@@ -44,7 +44,7 @@ public class JstRootTask implements RootTask<JstJobContext, JstSubTask> {
         List<JstSubTask> subTasks = new ArrayList<>(pairs.size());
         for (int i = 0; i < pairs.size(); i++) {
             Pair<Date, Date> pair = pairs.get(i);
-            subTasks.add(new JstSubTask(Long.valueOf(i), pair.first(), pair.second()));
+//            subTasks.add(new JstSubTask(Long.valueOf(i), pair.first(), pair.second()));
         }
         return subTasks;
     }

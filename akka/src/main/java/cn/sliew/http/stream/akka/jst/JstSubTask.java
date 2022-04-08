@@ -1,33 +1,31 @@
 package cn.sliew.http.stream.akka.jst;
 
-import cn.sliew.http.stream.akka.framework.ProcessResult;
-import cn.sliew.http.stream.akka.framework.SubTask;
+import cn.sliew.http.stream.akka.framework.batch.AbstractSubTask;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.concurrent.CompletableFuture;
 
 @Getter
 @Setter
-public abstract class JstSubTask<Context extends JstJobContext> implements SubTask<Context> {
-
-    private Long identifier;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date startTime;
+public abstract class JstSubTask<Context extends JstJobContext, Query, Result>
+        extends AbstractSubTask<Context, FetchResult<Query, Result>> {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date endTime;
+    private final Date startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private final Date endTime;
 
-    @Override
-    public Long getIdentifier() {
-        return identifier;
+    public JstSubTask(Long identifier, Date startTime, Date endTime) {
+        super(identifier);
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
-    @Override
-    public CompletableFuture<ProcessResult> execute(Context context) {
-        return null;
-    }
+    protected abstract Query getQuery();
+
+    protected abstract Result queryJst(Context context, Query query);
+
+    protected abstract void persistData(Context context, Query query, Result result);
 }
