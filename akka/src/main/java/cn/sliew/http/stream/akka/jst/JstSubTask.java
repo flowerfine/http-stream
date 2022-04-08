@@ -9,13 +9,10 @@ import java.util.Date;
 
 @Getter
 @Setter
-public abstract class JstSubTask<Context extends JstJobContext, Query, Result>
+public abstract class JstSubTask<Context extends JstIncrementalJobContext, Query, Result>
         extends AbstractSubTask<Context, FetchResult<Query, Result>> {
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private final Date startTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private final Date endTime;
+
 
     public JstSubTask(Long identifier, Date startTime, Date endTime) {
         super(identifier);

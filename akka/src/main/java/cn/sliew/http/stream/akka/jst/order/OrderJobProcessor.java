@@ -9,6 +9,7 @@ import akka.stream.javadsl.Source;
 import cn.sliew.http.stream.akka.framework.DefaultJobProcessor;
 import cn.sliew.http.stream.akka.framework.JobContext;
 import cn.sliew.http.stream.akka.framework.ProcessResult;
+import cn.sliew.http.stream.akka.framework.incremental.IncrementalJobProcessor;
 import cn.sliew.http.stream.akka.jst.JstRootTask;
 import cn.sliew.http.stream.akka.jst.JstSubTask;
 import cn.sliew.http.stream.akka.util.BeanUtil;
@@ -30,8 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 @Slf4j
-@Component
-public class OrderJobProcessor extends DefaultJobProcessor<JstRootTask, JstSubTask, JobSyncOffset> {
+public class OrderJobProcessor extends IncrementalJobProcessor<OrderJobContext, JstRootTask, JstSubTask> {
 
     private final JstRemoteService jstRemoteService;
     private final JstOrderMapper jstOrderMapper;
@@ -42,6 +42,8 @@ public class OrderJobProcessor extends DefaultJobProcessor<JstRootTask, JstSubTa
         this.jstOrderMapper = jstOrderMapper;
         this.actorSystem = actorSystem;
     }
+
+
 
     @Override
     public CompletableFuture<ProcessResult> process(JobContext<JobSyncOffset, JstRootTask, JstSubTask> context, JstSubTask subTask) {

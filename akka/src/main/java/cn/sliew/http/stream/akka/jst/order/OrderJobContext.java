@@ -1,22 +1,24 @@
 package cn.sliew.http.stream.akka.jst.order;
 
-import cn.sliew.http.stream.akka.jst.JstJobContext;
+import akka.actor.typed.ActorSystem;
+import cn.sliew.http.stream.akka.jst.JstIncrementalJobContext;
 import cn.sliew.http.stream.akka.jst.JstMethodEnum;
 import cn.sliew.http.stream.akka.util.DateUtil;
 import cn.sliew.http.stream.dao.entity.job.JobSyncOffset;
 import cn.sliew.http.stream.dao.mapper.job.JobSyncOffsetMapper;
+import io.micrometer.core.instrument.MeterRegistry;
 
 import java.time.LocalDateTime;
+import java.util.Properties;
 
-class OrderJobContext extends JstJobContext {
+class OrderJobContext extends JstIncrementalJobContext {
 
-    public OrderJobContext(JobSyncOffsetMapper jobSyncOffsetMapper) {
-        super(jobSyncOffsetMapper);
-    }
-
-    @Override
-    public String getJobName() {
-        return JstMethodEnum.ORDERS_SINGLE_QUERY.getMethod();
+    public OrderJobContext(String jobName,
+                           Properties properties,
+                           MeterRegistry meterRegistry,
+                           ActorSystem actorSystem,
+                           JobSyncOffsetMapper jobSyncOffsetMapper) {
+        super(jobName, properties, meterRegistry, actorSystem, jobSyncOffsetMapper);
     }
 
     @Override
@@ -30,6 +32,5 @@ class OrderJobContext extends JstJobContext {
         jobSyncOffsetMapper.insertSelective(syncOffset);
         return jobSyncOffsetMapper.selectByMethod(getJobName());
     }
-
 
 }

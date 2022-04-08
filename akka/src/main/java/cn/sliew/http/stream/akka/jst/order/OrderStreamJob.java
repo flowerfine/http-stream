@@ -8,35 +8,43 @@ import akka.event.Logging;
 import akka.japi.Pair;
 import akka.stream.*;
 import akka.stream.javadsl.*;
+import cn.sliew.http.stream.akka.framework.JobProcessor;
 import cn.sliew.http.stream.akka.framework.ProcessResult;
+import cn.sliew.http.stream.akka.jst.JstMethodEnum;
 import cn.sliew.http.stream.akka.jst.JstRootTask;
 import cn.sliew.http.stream.akka.jst.JstSubTask;
 import cn.sliew.http.stream.dao.mapper.job.JobSyncOffsetMapper;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 
+import java.util.Properties;
 import java.util.concurrent.CompletionStage;
 
 @Slf4j
 @Component
 public class OrderStreamJob implements ApplicationListener<ContextClosedEvent> {
 
+    private String jobName = JstMethodEnum.ORDERS_SINGLE_QUERY.name();
+    private Properties properties = new Properties();
+
+    private MeterRegistry meterRegistry;
     private ActorSystem<SpawnProtocol.Command> actorSystem;
-    private OrderJobProcessor processor;
     private JobSyncOffsetMapper jobSyncOffsetMapper;
 
     private volatile UniqueKillSwitch killSwitch;
 
-    public OrderStreamJob(ActorSystem<SpawnProtocol.Command> actorSystem, OrderJobProcessor processor, JobSyncOffsetMapper jobSyncOffsetMapper) {
+    public OrderStreamJob(MeterRegistry meterRegistry, ActorSystem<SpawnProtocol.Command> actorSystem, JobSyncOffsetMapper jobSyncOffsetMapper) {
+        this.meterRegistry = meterRegistry;
         this.actorSystem = actorSystem;
-        this.processor = processor;
         this.jobSyncOffsetMapper = jobSyncOffsetMapper;
     }
 
     public void execute() throws Exception {
-        OrderJobContext context = new OrderJobContext(jobSyncOffsetMapper);
+        OrderJobContext context = new OrderJobContext(jobName, properties, meterRegistry, actorSystem, jobSyncOffsetMapper);
+
         Source<JstSubTask, UniqueKillSwitch> source = Source.single(new JstRootTask())
                 .mapConcat(rootTask -> processor.map(context, rootTask))
                 .viaMat(KillSwitches.single(), Keep.right());

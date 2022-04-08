@@ -11,7 +11,7 @@ import java.time.Duration;
 import java.util.*;
 
 @Slf4j
-public abstract class JstRootTask implements RootTask<JstJobContext, JstSubTask> {
+public abstract class JstRootTask implements RootTask<JstIncrementalJobContext, JstSubTask> {
 
     /**
      * 默认的时间梯度为: 1h, 30min, 15min, 5min, 2min, 1min, 30s, 15s, 10s, 5s
@@ -29,7 +29,7 @@ public abstract class JstRootTask implements RootTask<JstJobContext, JstSubTask>
             Duration.ofSeconds(5L));
 
     @Override
-    public List<JstSubTask> split(JstJobContext context) {
+    public List<JstSubTask> split(JstIncrementalJobContext context) {
         JobSyncOffset syncOffset = context.getSyncOffset(this);
         Date startTime = syncOffset.getEndTime();
         Date endTime = DateUtil.lastSecond();
