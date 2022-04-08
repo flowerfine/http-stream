@@ -55,7 +55,7 @@ public class OrderJobProcessor extends AbstractJobProcessor<JstRootTask, JstSubT
         JstResult<OrdersSingleDO> jstResult = jstRemoteService.ordersSingleQuery(query);
         if (jstResult.isSuccess()) {
             if (log.isTraceEnabled()) {
-                log.debug("请求聚水潭接口返回结果 method: {}, query: {}, page_index: {}, page_size: {}, data_count: {}, page_count: {}",
+                log.trace("请求聚水潭接口返回结果 method: {}, query: {}, page_index: {}, page_size: {}, data_count: {}, page_count: {}",
                         context.getJobName(), JacksonUtil.toJsonString(query), jstResult.getPageIndex(), jstResult.getPageSize(), jstResult.getDataCount(), jstResult.getPageCount());
             }
             return jstResult;
