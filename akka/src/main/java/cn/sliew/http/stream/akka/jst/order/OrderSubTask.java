@@ -1,6 +1,7 @@
 package cn.sliew.http.stream.akka.jst.order;
 
 import akka.NotUsed;
+import akka.japi.Pair;
 import akka.stream.javadsl.Source;
 import cn.sliew.http.stream.akka.jst.FetchResult;
 import cn.sliew.http.stream.akka.jst.JstSubTask;
@@ -17,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class OrderSubTask extends JstSubTask<OrderJobContext, OrdersSingleQuery, JstOrdersResult> {
@@ -30,7 +33,7 @@ public class OrderSubTask extends JstSubTask<OrderJobContext, OrdersSingleQuery,
     private final JstOrderMapper jstOrderMapper;
 
     public OrderSubTask(Long identifier, Date startTime, Date endTime, JstRemoteService jstRemoteService, JstOrderMapper jstOrderMapper) {
-        super(identifier, startTime, endTime);
+        super(identifier);
         this.startTime = startTime;
         this.endTime = endTime;
         this.jstRemoteService = jstRemoteService;
@@ -39,22 +42,25 @@ public class OrderSubTask extends JstSubTask<OrderJobContext, OrdersSingleQuery,
 
     @Override
     protected Source<FetchResult<OrdersSingleQuery, JstOrdersResult>, NotUsed> fetch(OrderJobContext context) {
-        return null;
+        OrdersSingleQuery query = getFirstPageQuery();
+        return Source.unfoldAsync(query, key -> {
+            if (key == null) {
+                return CompletableFuture.completedFuture(Optional.empty());
+            }
+            JstOrdersResult jstOrdersResult = queryJst(context, key);
+            FetchResult<OrdersSingleQuery, JstOrdersResult> result = new FetchResult<>(query, jstOrdersResult);
+            if (jstOrdersResult.getHasNext()) {
+                OrdersSingleQuery next = BeanUtil.copy(key, new OrdersSingleQuery());
+                next.setPageIndex(key.getPageIndex() + 1);
+                return CompletableFuture.completedFuture(Optional.of(Pair.create(next, result)));
+            }
+            return CompletableFuture.completedFuture(Optional.of(Pair.create(null, result)));
+        });
     }
 
     @Override
     protected void persist(OrderJobContext context, FetchResult<OrdersSingleQuery, JstOrdersResult> data) {
-
-    }
-
-    @Override
-    protected OrdersSingleQuery getQuery() {
-        OrdersSingleQuery query = new OrdersSingleQuery();
-        query.setStartTime(startTime);
-        query.setEndTime(endTime);
-        query.setPageIndex(1);
-        query.setPageSize(50);
-        return query;
+        persistData(context, data.getQuery(), data.getResult());
     }
 
     @Override
@@ -98,5 +104,14 @@ public class OrderSubTask extends JstSubTask<OrderJobContext, OrdersSingleQuery,
             record.setModifier("sync-task");
             jstOrderMapper.insertSelective(record);
         }
+    }
+
+    private OrdersSingleQuery getFirstPageQuery() {
+        OrdersSingleQuery query = new OrdersSingleQuery();
+        query.setStartTime(startTime);
+        query.setEndTime(endTime);
+        query.setPageIndex(1);
+        query.setPageSize(50);
+        return query;
     }
 }
