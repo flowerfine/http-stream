@@ -6,14 +6,18 @@ import io.github.resilience4j.core.registry.EntryRemovedEvent;
 import io.github.resilience4j.core.registry.EntryReplacedEvent;
 import io.github.resilience4j.core.registry.RegistryEventConsumer;
 import io.github.resilience4j.retry.Retry;
-import io.github.resilience4j.retry.event.*;
+import io.github.resilience4j.retry.event.RetryOnErrorEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.format.DateTimeFormatter;
+
 @Slf4j
 @Configuration
 public class RetryConfig {
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Bean
     public RegistryEventConsumer<Retry> customeLogRetryRegistryEventConsumer() {
@@ -35,43 +39,17 @@ public class RetryConfig {
         };
     }
 
-    @Bean
-    public EventConsumer<RetryEvent> logRetryEventConsumer() {
-        return event -> log.info("{}:----- {}", event.getClass().getName(), event.toString());
-    }
-
     private void registerEventConsumer(Retry.EventPublisher eventPublisher) {
-        eventPublisher.onRetry(new RetryEventConsumer());
-        eventPublisher.onSuccess(new SuccessEventConsumer());
         eventPublisher.onError(new ErrorEventConsumer());
-        eventPublisher.onIgnoredError(new IgnoredErrorEventConsumer());
-    }
-
-    private class IgnoredErrorEventConsumer implements EventConsumer<RetryOnIgnoredErrorEvent> {
-        @Override
-        public void consumeEvent(RetryOnIgnoredErrorEvent event) {
-            log.error("event: {}", event);
-        }
     }
 
     private class ErrorEventConsumer implements EventConsumer<RetryOnErrorEvent> {
         @Override
         public void consumeEvent(RetryOnErrorEvent event) {
-            log.error("event: {}", event);
-        }
-    }
-
-    private class RetryEventConsumer implements EventConsumer<RetryOnRetryEvent> {
-        @Override
-        public void consumeEvent(RetryOnRetryEvent event) {
-            log.error("event: {}", event);
-        }
-    }
-
-    private class SuccessEventConsumer implements EventConsumer<RetryOnSuccessEvent> {
-        @Override
-        public void consumeEvent(RetryOnSuccessEvent event) {
-            log.error("event: {}", event);
+            log.error("{} 重试失败! 失败次数: {}, 失败时间: {}",
+                    event.getName(), event.getNumberOfRetryAttempts(),
+                    event.getCreationTime().format(formatter),
+                    event.getLastThrowable());
         }
     }
 }

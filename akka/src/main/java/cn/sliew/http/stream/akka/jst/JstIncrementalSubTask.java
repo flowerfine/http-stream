@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
-public abstract class JstIncrementalSubTask<Query, Result> extends JstSubTask<JstIncrementalJobContext, Query, Result> {
+public abstract class JstIncrementalSubTask<Context extends JstIncrementalJobContext, Query, Result> extends JstSubTask<Context, Query, Result> {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private final Date startTime;

@@ -4,7 +4,7 @@ import akka.NotUsed;
 import akka.japi.Pair;
 import akka.stream.javadsl.Source;
 import cn.sliew.http.stream.akka.jst.FetchResult;
-import cn.sliew.http.stream.akka.jst.JstSubTask;
+import cn.sliew.http.stream.akka.jst.JstIncrementalSubTask;
 import cn.sliew.http.stream.akka.util.BeanUtil;
 import cn.sliew.http.stream.akka.util.JacksonUtil;
 import cn.sliew.http.stream.dao.entity.jst.JstOrder;
@@ -13,7 +13,6 @@ import cn.sliew.http.stream.remote.jst.JstRemoteService;
 import cn.sliew.http.stream.remote.jst.client.order.JstOrdersResult;
 import cn.sliew.http.stream.remote.jst.client.order.OrdersSingleDO;
 import cn.sliew.http.stream.remote.jst.client.order.OrdersSingleQuery;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -22,20 +21,13 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
-class OrderSubTask extends JstSubTask<OrderJobContext, OrdersSingleQuery, JstOrdersResult> {
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private final Date startTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private final Date endTime;
+class OrderSubTask extends JstIncrementalSubTask<OrderJobContext, OrdersSingleQuery, JstOrdersResult> {
 
     private final JstRemoteService jstRemoteService;
     private final JstOrderMapper jstOrderMapper;
 
     public OrderSubTask(Long identifier, Date startTime, Date endTime, JstRemoteService jstRemoteService, JstOrderMapper jstOrderMapper) {
-        super(identifier);
-        this.startTime = startTime;
-        this.endTime = endTime;
+        super(identifier, startTime, endTime);
         this.jstRemoteService = jstRemoteService;
         this.jstOrderMapper = jstOrderMapper;
     }
@@ -111,8 +103,8 @@ class OrderSubTask extends JstSubTask<OrderJobContext, OrdersSingleQuery, JstOrd
 
     private OrdersSingleQuery getFirstPageQuery() {
         OrdersSingleQuery query = new OrdersSingleQuery();
-        query.setStartTime(startTime);
-        query.setEndTime(endTime);
+        query.setStartTime(getStartTime());
+        query.setEndTime(getEndTime());
         query.setPageIndex(1);
         query.setPageSize(50);
         return query;
