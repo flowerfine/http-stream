@@ -10,10 +10,12 @@ import akka.stream.*;
 import akka.stream.javadsl.*;
 import cn.sliew.http.stream.akka.framework.JobProcessor;
 import cn.sliew.http.stream.akka.framework.ProcessResult;
+import cn.sliew.http.stream.akka.framework.incremental.DefaultIncrementalJobProcessor;
 import cn.sliew.http.stream.akka.jst.JstMethodEnum;
-import cn.sliew.http.stream.akka.jst.JstRootTask;
 import cn.sliew.http.stream.akka.jst.JstSubTask;
 import cn.sliew.http.stream.dao.mapper.job.JobSyncOffsetMapper;
+import cn.sliew.http.stream.dao.mapper.jst.JstOrderMapper;
+import cn.sliew.http.stream.remote.jst.JstRemoteService;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
@@ -33,24 +35,33 @@ public class OrderStreamJob implements ApplicationListener<ContextClosedEvent> {
     private MeterRegistry meterRegistry;
     private ActorSystem<SpawnProtocol.Command> actorSystem;
     private JobSyncOffsetMapper jobSyncOffsetMapper;
+    private JstRemoteService jstRemoteService;
+    private JstOrderMapper jstOrderMapper;
 
     private volatile UniqueKillSwitch killSwitch;
 
-    public OrderStreamJob(MeterRegistry meterRegistry, ActorSystem<SpawnProtocol.Command> actorSystem, JobSyncOffsetMapper jobSyncOffsetMapper) {
+    public OrderStreamJob(MeterRegistry meterRegistry,
+                          ActorSystem<SpawnProtocol.Command> actorSystem,
+                          JobSyncOffsetMapper jobSyncOffsetMapper,
+                          JstRemoteService jstRemoteService,
+                          JstOrderMapper jstOrderMapper) {
         this.meterRegistry = meterRegistry;
         this.actorSystem = actorSystem;
         this.jobSyncOffsetMapper = jobSyncOffsetMapper;
+        this.jstRemoteService = jstRemoteService;
+        this.jstOrderMapper = jstOrderMapper;
     }
 
     public void execute() throws Exception {
         OrderJobContext context = new OrderJobContext(jobName, properties, meterRegistry, actorSystem, jobSyncOffsetMapper);
+        JobProcessor processor = new DefaultIncrementalJobProcessor(context);
 
-        Source<JstSubTask, UniqueKillSwitch> source = Source.single(new JstRootTask())
-                .mapConcat(rootTask -> processor.map(context, rootTask))
+        Source<JstSubTask, UniqueKillSwitch> source = Source.single(new OrderRootTask(jstRemoteService, jstOrderMapper))
+                .mapConcat(rootTask -> processor.map(rootTask))
                 .viaMat(KillSwitches.single(), Keep.right());
 
         Flow<JstSubTask, ProcessResult, NotUsed> process = Flow.<JstSubTask>create()
-                .map(subTask -> processor.process(context, subTask)).mapAsync(1, future -> future);
+                .map(subTask -> processor.process(subTask)).mapAsync(1, future -> future);
 
         Flow<JstSubTask, ProcessResult, NotUsed> subTasks =
                 Flow.fromGraph(
@@ -80,7 +91,7 @@ public class OrderStreamJob implements ApplicationListener<ContextClosedEvent> {
                                 Logging.ErrorLevel()  // onFailure
                         )
                 )
-                .toMat(Sink.foreach(result -> processor.reduce(context, result)), Keep.both())
+                .toMat(Sink.foreach(result -> processor.reduce(result)), Keep.both())
                 .run(actorSystem);
 
         killSwitch = pair.first();
@@ -90,7 +101,7 @@ public class OrderStreamJob implements ApplicationListener<ContextClosedEvent> {
 
     @Override
     public void onApplicationEvent(ContextClosedEvent contextClosedEvent) {
-        log.error("应用关闭，尝试关闭 akka-stream job!");
+        log.error("应用关闭，尝试关闭 akka-streams job: {}!", jobName);
         if (killSwitch != null) {
             killSwitch.shutdown();
         }

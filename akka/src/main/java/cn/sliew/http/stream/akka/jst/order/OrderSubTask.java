@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
-public class OrderSubTask extends JstSubTask<OrderJobContext, OrdersSingleQuery, JstOrdersResult> {
+class OrderSubTask extends JstSubTask<OrderJobContext, OrdersSingleQuery, JstOrdersResult> {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private final Date startTime;
