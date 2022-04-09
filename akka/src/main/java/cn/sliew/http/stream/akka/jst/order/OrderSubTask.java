@@ -69,10 +69,13 @@ class OrderSubTask extends JstSubTask<OrderJobContext, OrdersSingleQuery, JstOrd
         if (jstResult.isSuccess()) {
             if (log.isDebugEnabled()) {
                 log.debug("请求聚水潭接口返回结果 method: {}, query: {}, page_index: {}, page_size: {}, data_count: {}, page_count: {}",
-                        context.getJobName(), JacksonUtil.toJsonString(query), jstResult.getPageIndex(), jstResult.getPageSize(), jstResult.getDataCount(), jstResult.getPageCount());
+                        context.getJobName(), JacksonUtil.toJsonString(query), jstResult.getPageIndex(), jstResult.getPageSize(),
+                        jstResult.getDataCount(), jstResult.getPageCount());
             }
             return jstResult;
         }
+        log.error("请求聚水潭接口失败! method: {}, code: {}, msg: {}, query: {}",
+                context.getJobName(), jstResult.getCode(), jstResult.getMsg(), JacksonUtil.toJsonString(query));
         throw new RuntimeException(jstResult.getMsg());
     }
 

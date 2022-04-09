@@ -9,8 +9,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 
 import java.util.Properties;
 
-public abstract class JstIncrementalJobContext extends BatchJobContext<JstIncrementalRootTask, JstSubTask>
-        implements IncrementalJobContext<JobSyncOffset, JstIncrementalRootTask, JstSubTask> {
+public abstract class JstIncrementalJobContext extends BatchJobContext<JstIncrementalRootTask, JstIncrementalSubTask>
+        implements IncrementalJobContext<JobSyncOffset, JstIncrementalRootTask, JstIncrementalSubTask> {
 
     protected final JobSyncOffsetMapper jobSyncOffsetMapper;
 
@@ -34,7 +34,7 @@ public abstract class JstIncrementalJobContext extends BatchJobContext<JstIncrem
     }
 
     @Override
-    public void updateSyncOffset(JstSubTask subTask) {
+    public void updateSyncOffset(JstIncrementalSubTask subTask) {
         JobSyncOffset syncOffset = new JobSyncOffset();
         syncOffset.setMethod(getJobName());
         syncOffset.setStartTime(subTask.getStartTime());
