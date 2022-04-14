@@ -1,11 +1,12 @@
 package cn.sliew.http.stream.format.akka;
 
-import akka.stream.javadsl.Flow;
+import akka.NotUsed;
 import akka.stream.javadsl.Sink;
 import cn.sliew.http.stream.format.AkkaEnvironment;
 import cn.sliew.http.stream.format.BaseAkkaSink;
+import org.apache.arrow.vector.VectorSchemaRoot;
 
-public interface AkkaSink<In, Out, Mat> extends BaseAkkaSink {
+public interface AkkaSink extends BaseAkkaSink {
 
-    Sink<Out, Mat> outputStream(AkkaEnvironment env, Flow<In, Out, Mat> source);
+    Sink<VectorSchemaRoot, NotUsed> outputStream(AkkaEnvironment env);
 }
