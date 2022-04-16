@@ -8,6 +8,7 @@ import cn.sliew.http.stream.format.jdbc.sql.SqlBuilder;
 import org.apache.arrow.vector.*;
 
 import javax.sql.DataSource;
+import java.io.PrintWriter;
 import java.sql.*;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
@@ -27,7 +28,7 @@ public class JdbcSinkBuilder {
         return this;
     }
 
-    public Sink<VectorSchemaRoot, CompletionStage<Done>> build() {
+    public Sink<VectorSchemaRoot, CompletionStage<Done>> build() throws SQLException {
         SqlBuilder sqlBuilder = new SqlBuilder(sql);
         sqlBuilder.parse();
         String executeSql = sqlBuilder.getSql();
@@ -35,14 +36,22 @@ public class JdbcSinkBuilder {
 
         HikaricpDataSourceProvider dataSourceProvider = new HikaricpDataSourceProvider(options);
         DataSource dataSource = dataSourceProvider.getDataSource();
+        dataSource.setLogWriter(new PrintWriter(System.out));
 
         return Sink.foreach(vector -> {
             Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(executeSql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            for (int i = 0; i < parameters.size(); i++) {
-                FieldVector fieldVector = vector.getVector(parameters.get(i));
-                setParameter(statement, i, fieldVector);
+            for (int row = 0; row < vector.getRowCount(); row++) {
+                for (int i = 0; i < parameters.size(); i++) {
+                    FieldVector fieldVector = vector.getVector(parameters.get(i));
+                    setParameter(statement, i, fieldVector);
+                }
+                statement.addBatch();
             }
+            statement.executeBatch();
+            statement.close();
+            connection.close();
+            vector.close();
         });
     }
 
