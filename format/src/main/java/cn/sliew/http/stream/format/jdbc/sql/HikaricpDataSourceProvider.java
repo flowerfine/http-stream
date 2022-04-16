@@ -19,6 +19,9 @@ public class HikaricpDataSourceProvider implements DataSourceProvider{
         dataSource.setJdbcUrl(options.getJdbcUrl());
         dataSource.setUsername(options.getUsername());
         dataSource.setPassword(options.getPassword());
+        dataSource.setMinimumIdle(1);
+        dataSource.setMaximumPoolSize(5);
+        dataSource.setConnectionInitSql("select 1 from dual");
         return dataSource;
     }
 }

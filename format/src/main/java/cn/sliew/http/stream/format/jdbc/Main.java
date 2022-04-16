@@ -32,7 +32,7 @@ public class Main {
                 .password("123")
                 .build();
         builder.setDataSourceOptions(dataSourceOptions);
-        builder.setSql("insert into test_source (age, name) values (#{age}, #{name)");
+        builder.setSql("insert into test_source (age, name) values (#{age}, #{name})");
         Sink<VectorSchemaRoot, CompletionStage<Done>> sink = builder.build();
 
         ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(Behaviors.setup(ctx -> SpawnProtocol.create()), "main");
