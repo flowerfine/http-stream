@@ -21,6 +21,7 @@
         <module>format</module>
         <module>akka</module>
         <module>web</module>
+        <module>flink</module>
     </modules>
 
     <properties>
