@@ -2,60 +2,51 @@ package cn.sliew.http.stream.format.jdbc.sink;
 
 import akka.Done;
 import akka.stream.javadsl.Sink;
-import cn.sliew.http.stream.format.jdbc.sql.DataSourceOptions;
-import cn.sliew.http.stream.format.jdbc.sql.HikaricpDataSourceProvider;
+import cn.sliew.http.stream.format.jdbc.BaseJdbcConnector;
 import cn.sliew.http.stream.format.jdbc.sql.SqlBuilder;
 import org.apache.arrow.vector.*;
 
-import javax.sql.DataSource;
-import java.io.PrintWriter;
 import java.sql.*;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 
-public class JdbcSinkBuilder {
+public class JdbcSinkBuilder extends BaseJdbcConnector<JdbcSinkBuilder> {
 
-    private DataSourceOptions options;
-    private String sql;
+    private List<String> parameters;
 
-    public JdbcSinkBuilder setDataSourceOptions(DataSourceOptions options) {
-        this.options = options;
-        return this;
-    }
-
+    @Override
     public JdbcSinkBuilder setSql(String sql) {
-        this.sql = sql;
-        return this;
-    }
-
-    public Sink<VectorSchemaRoot, CompletionStage<Done>> build() throws SQLException {
         SqlBuilder sqlBuilder = new SqlBuilder(sql);
         sqlBuilder.parse();
-        String executeSql = sqlBuilder.getSql();
-        List<String> parameters = sqlBuilder.getParameters();
+        this.parameters = sqlBuilder.getParameters();
+        return super.setSql(sqlBuilder.getSql());
+    }
 
-        HikaricpDataSourceProvider dataSourceProvider = new HikaricpDataSourceProvider(options);
-        DataSource dataSource = dataSourceProvider.getDataSource();
-        dataSource.setLogWriter(new PrintWriter(System.out));
+    public Sink<VectorSchemaRoot, CompletionStage<Done>> build() {
+        return Sink.foreach(this::execute);
+    }
 
-        return Sink.foreach(vector -> {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(executeSql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            for (int row = 0; row < vector.getRowCount(); row++) {
-                for (int i = 0; i < parameters.size(); i++) {
-                    FieldVector fieldVector = vector.getVector(parameters.get(i));
-                    setParameter(statement, i + 1, row, fieldVector);
-                }
-                statement.addBatch();
+    private void execute(VectorSchemaRoot vectorSchemaRoot) throws SQLException {
+        Connection connection = dataSource.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        for (int row = 0; row < vectorSchemaRoot.getRowCount(); row++) {
+            for (int i = 0; i < parameters.size(); i++) {
+                FieldVector fieldVector = vectorSchemaRoot.getVector(parameters.get(i));
+                setParameter(statement, i + 1, row, fieldVector);
             }
-            statement.executeBatch();
-            statement.close();
-            connection.close();
-            vector.close();
-        });
+            statement.addBatch();
+        }
+        statement.executeBatch();
+        statement.close();
+        connection.close();
+        vectorSchemaRoot.close();
     }
 
     private void setParameter(PreparedStatement statement, int parameterIndex, int row, FieldVector fieldVector) throws SQLException {
+        if (fieldVector.isNull(row)) {
+            statement.setNull(parameterIndex, Types.NULL);
+            return;
+        }
         if (fieldVector instanceof TinyIntVector) {
             TinyIntVector tinyIntVector = (TinyIntVector) fieldVector;
             statement.setByte(parameterIndex, tinyIntVector.getObject(row));
@@ -133,6 +124,4 @@ public class JdbcSinkBuilder {
             statement.setBoolean(parameterIndex, bitVector.getObject(row));
         }
     }
-
-
 }

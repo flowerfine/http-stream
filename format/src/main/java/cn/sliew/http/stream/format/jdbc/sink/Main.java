@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.format.jdbc;
+package cn.sliew.http.stream.format.jdbc.sink;
 
 import akka.Done;
 import akka.actor.typed.ActorSystem;
@@ -6,7 +6,6 @@ import akka.actor.typed.SpawnProtocol;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import cn.sliew.http.stream.format.jdbc.sink.JdbcSinkBuilder;
 import cn.sliew.http.stream.format.jdbc.sql.DataSourceOptions;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.IntVector;
@@ -23,7 +22,7 @@ import java.util.concurrent.CompletionStage;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         JdbcSinkBuilder builder = new JdbcSinkBuilder();
         DataSourceOptions dataSourceOptions = DataSourceOptions.builder()
                 .driverName("com.mysql.cj.jdbc.Driver")
@@ -31,7 +30,7 @@ public class Main {
                 .username("root")
                 .password("123")
                 .build();
-        builder.setDataSourceOptions(dataSourceOptions);
+        builder.setDataSource(dataSourceOptions);
         builder.setSql("insert into test_source (age, name) values (#{age}, #{name})");
         Sink<VectorSchemaRoot, CompletionStage<Done>> sink = builder.build();
 
