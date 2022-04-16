@@ -1,5 +1,7 @@
 package cn.sliew.http.stream.format.jdbc.sql;
 
+import com.zaxxer.hikari.HikariDataSource;
+
 import javax.sql.DataSource;
 
 public class HikaricpDataSourceProvider implements DataSourceProvider{
@@ -12,6 +14,11 @@ public class HikaricpDataSourceProvider implements DataSourceProvider{
 
     @Override
     public DataSource getDataSource() {
-        return null;
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setDriverClassName(options.getDriverName());
+        dataSource.setJdbcUrl(options.getJdbcUrl());
+        dataSource.setUsername(options.getUsername());
+        dataSource.setPassword(options.getPassword());
+        return dataSource;
     }
 }
