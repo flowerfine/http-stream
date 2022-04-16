@@ -27,7 +27,7 @@ public class Main {
         JdbcSinkBuilder builder = new JdbcSinkBuilder();
         DataSourceOptions dataSourceOptions = DataSourceOptions.builder()
                 .driverName("com.mysql.cj.jdbc.Driver")
-                .jdbcUrl("jdbc:mysql://localhost:3301/data_service?serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull&useAffectedRows=true")
+                .jdbcUrl("jdbc:mysql://localhost:3306/data_service?serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull&useAffectedRows=true")
                 .username("root")
                 .password("123")
                 .build();
@@ -37,7 +37,12 @@ public class Main {
 
         ActorSystem<SpawnProtocol.Command> actorSystem = ActorSystem.create(Behaviors.setup(ctx -> SpawnProtocol.create()), "main");
         CompletionStage<Done> stage = Source.single(getVectorSchemaRoot()).runWith(sink, actorSystem);
-        stage.whenComplete(((done, throwable) -> actorSystem.terminate()));
+        stage.whenComplete(((done, throwable) -> {
+            if (throwable != null) {
+                throwable.printStackTrace();
+            }
+            actorSystem.terminate();
+        }));
     }
 
     private static VectorSchemaRoot getVectorSchemaRoot() {
