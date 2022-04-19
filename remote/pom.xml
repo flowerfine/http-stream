@@ -41,6 +41,12 @@
             <artifactId>resilience4j-spring-boot2</artifactId>
             <version>1.7.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>cn.sliew</groupId>
+            <artifactId>milky-common</artifactId>
+            <version>1.0.5</version>
+        </dependency>
     </dependencies>
 
 </project>

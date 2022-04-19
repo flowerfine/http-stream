@@ -2,6 +2,7 @@ package cn.sliew.http.stream.web.controller.remote;
 
 import cn.sliew.http.stream.remote.github.GithubRemoteService;
 import cn.sliew.http.stream.remote.github.client.commit.CommitListDO;
+import cn.sliew.http.stream.remote.github.client.commit.CommitListQuery;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,8 @@ public class GithubController {
     @GetMapping("{owner}/{repo}/commits")
     @ApiOperation("查询仓库提交记录")
     public List<CommitListDO> listCommits(@PathVariable("owner") String owner,
-                                          @PathVariable("repo") String repo) {
-        return githubRemoteService.listCommits(owner, repo);
+                                          @PathVariable("repo") String repo,
+                                          CommitListQuery query) {
+        return githubRemoteService.listCommits(owner, repo, query);
     }
 }

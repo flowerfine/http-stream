@@ -2,6 +2,7 @@ package cn.sliew.http.stream.remote.github;
 
 import cn.sliew.http.stream.remote.github.client.GithubClient;
 import cn.sliew.http.stream.remote.github.client.commit.CommitListDO;
+import cn.sliew.http.stream.remote.github.client.commit.CommitListQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ public class GithubRemoteServiceImpl implements GithubRemoteService {
     private GithubClient client;
 
     @Override
-    public List<CommitListDO> listCommits(String owner, String repo) {
-        return client.listCommits(owner, repo);
+    public List<CommitListDO> listCommits(String owner, String repo, CommitListQuery query) {
+        return client.listCommits(owner, repo, query);
     }
 }

@@ -31,12 +31,14 @@ mybatis-plus:
     db-column-underline: true
     banner: off
 
-feign.client.config:
-  default:
-    connectTimeout: 5000
-    readTimeout: 5000
-    loggerLevel: NONE
-#    loggerLevel: full
+feign:
+  autoconfiguration.jackson.enabled: true
+  client.config:
+    default:
+      connectTimeout: 5000
+      readTimeout: 5000
+#      loggerLevel: NONE
+      loggerLevel: full
 
 management:
   endpoints.web.exposure.include: "*"

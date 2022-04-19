@@ -1,5 +1,7 @@
 package cn.sliew.http.stream.remote.config;
 
+import cn.sliew.http.stream.remote.github.client.JacksonQueryMapEncoder;
+import feign.QueryMapEncoder;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.okhttp.OkHttpClient;
@@ -29,6 +31,11 @@ public class DefaultFeignConfig {
     @Bean
     public OkHttpClient client() {
         return new OkHttpClient();
+    }
+
+    @Bean
+    public QueryMapEncoder queryMapEncoder() {
+        return new JacksonQueryMapEncoder();
     }
 
     @Bean
