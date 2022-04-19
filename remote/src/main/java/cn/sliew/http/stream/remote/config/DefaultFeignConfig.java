@@ -21,7 +21,7 @@ import java.util.List;
 
 @Configuration
 @EnableFeignClients(basePackages = "cn.sliew.http.stream.remote")
-public class FeignConfig {
+public class DefaultFeignConfig {
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonConverter;
@@ -52,5 +52,4 @@ public class FeignConfig {
         supportedMediaTypes.addAll(Arrays.asList(MediaType.TEXT_HTML, MediaType.TEXT_PLAIN));
         jacksonConverter.setSupportedMediaTypes(supportedMediaTypes);
     }
-
 }
