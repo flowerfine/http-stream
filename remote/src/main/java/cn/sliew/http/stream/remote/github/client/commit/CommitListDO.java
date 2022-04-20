@@ -14,17 +14,17 @@ public class CommitListDO {
     @JsonProperty("sha")
     private String sha;
 
-    @JsonProperty("nodeId")
-    private String node_id;
+    @JsonProperty("node_id")
+    private String nodeId;
 
     @JsonProperty("url")
     private String url;
 
-    @JsonProperty("htmlUrl")
-    private String html_url;
+    @JsonProperty("html_url")
+    private String htmlUrl;
 
-    @JsonProperty("commentsUrl")
-    private String comments_url;
+    @JsonProperty("comments_url")
+    private String commentsUrl;
 
     private Map commit;
 

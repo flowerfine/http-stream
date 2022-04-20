@@ -13,6 +13,14 @@ public class CommitMessageParameters extends MessageParameters {
     private final OwnerPathParameter owner = new OwnerPathParameter();
     private final RepoPathParameter repo = new RepoPathParameter();
 
+    private final ShaQueryParameter sha = new ShaQueryParameter();
+    private final PathQueryParameter path = new PathQueryParameter();
+    private final AuthorQueryParameter author = new AuthorQueryParameter();
+    private final SinceQueryParameter since = new SinceQueryParameter();
+    private final UntilQueryParameter until = new UntilQueryParameter();
+    private final PerPageQueryParameter perPage = new PerPageQueryParameter();
+    private final PageQueryParameter page = new PageQueryParameter();
+
     @Override
     public Collection<MessagePathParameter<?>> getPathParameters() {
         return Collections.unmodifiableCollection(Arrays.asList(owner, repo));
@@ -20,6 +28,6 @@ public class CommitMessageParameters extends MessageParameters {
 
     @Override
     public Collection<MessageQueryParameter<?>> getQueryParameters() {
-        return Collections.emptyList();
+        return Collections.unmodifiableCollection(Arrays.asList(sha, path, author, since, until, perPage, page));
     }
 }
