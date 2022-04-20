@@ -10,16 +10,16 @@ import java.util.Collections;
 
 public class CommitMessageParameters extends MessageParameters {
 
-    private final OwnerPathParameter owner = new OwnerPathParameter();
-    private final RepoPathParameter repo = new RepoPathParameter();
+    public final OwnerPathParameter owner = new OwnerPathParameter();
+    public final RepoPathParameter repo = new RepoPathParameter();
 
-    private final ShaQueryParameter sha = new ShaQueryParameter();
-    private final PathQueryParameter path = new PathQueryParameter();
-    private final AuthorQueryParameter author = new AuthorQueryParameter();
-    private final SinceQueryParameter since = new SinceQueryParameter();
-    private final UntilQueryParameter until = new UntilQueryParameter();
-    private final PerPageQueryParameter perPage = new PerPageQueryParameter();
-    private final PageQueryParameter page = new PageQueryParameter();
+    public final ShaQueryParameter sha = new ShaQueryParameter();
+    public final PathQueryParameter path = new PathQueryParameter();
+    public final AuthorQueryParameter author = new AuthorQueryParameter();
+    public final SinceQueryParameter since = new SinceQueryParameter();
+    public final UntilQueryParameter until = new UntilQueryParameter();
+    public final PerPageQueryParameter perPage = new PerPageQueryParameter();
+    public final PageQueryParameter page = new PageQueryParameter();
 
     @Override
     public Collection<MessagePathParameter<?>> getPathParameters() {

@@ -44,7 +44,9 @@ public class GithubController {
         RestClientConfiguration configuration = RestClientConfiguration.fromConfiguration(new Configuration());
         RestClient client = new RestClient(configuration, executorService);
         CommitMessageParameters parameters = new CommitMessageParameters();
-        CompletableFuture<CommitResponseBody> future = client.sendRequest("https://api.github.com/", 80, CommitHeaders.getInstance(), parameters, EmptyRequestBody.getInstance());
+        parameters.owner.resolveFromString(owner);
+        parameters.repo.resolveFromString(repo);
+        CompletableFuture<CommitResponseBody> future = client.sendRequest("api.github.com", 80, CommitHeaders.getInstance(), parameters, EmptyRequestBody.getInstance());
         CommitResponseBody commitResponseBody = future.get();
         System.out.println(JacksonUtil.toJsonString(commitResponseBody));
         return githubRemoteService.listCommits(owner, repo, query);
