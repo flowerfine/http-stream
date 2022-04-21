@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.akka.util;
+package cn.sliew.http.stream.common.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cglib.beans.BeanCopier;

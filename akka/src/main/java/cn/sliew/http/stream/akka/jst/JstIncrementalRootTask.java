@@ -3,7 +3,7 @@ package cn.sliew.http.stream.akka.jst;
 import akka.japi.Pair;
 import cn.sliew.http.stream.akka.framework.RootTask;
 import cn.sliew.http.stream.akka.framework.SyncOffsetHelper;
-import cn.sliew.http.stream.akka.util.DateUtil;
+import cn.sliew.http.stream.common.util.DateUtil;
 import cn.sliew.http.stream.dao.entity.job.JobSyncOffset;
 import lombok.extern.slf4j.Slf4j;
 
