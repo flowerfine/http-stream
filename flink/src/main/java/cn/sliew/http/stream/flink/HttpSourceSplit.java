@@ -57,4 +57,8 @@ public class HttpSourceSplit implements SourceSplit, Serializable {
     public Optional<CheckpointedPosition> getPosition() {
         return Optional.ofNullable(position);
     }
+
+    public HttpSourceSplit updateWithCheckpointedPosition(@Nullable CheckpointedPosition position) {
+        return new HttpSourceSplit(id, startTime, endTime, position);
+    }
 }

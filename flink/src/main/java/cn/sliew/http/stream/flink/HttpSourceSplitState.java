@@ -36,6 +36,7 @@ public abstract class HttpSourceSplitState<SplitT extends HttpSourceSplit> {
     }
 
     public SplitT toSourceSplit() {
-        return split;
+        CheckpointedPosition position = new CheckpointedPosition(pageIndex, pageSize);
+        return (SplitT) split.updateWithCheckpointedPosition(position);
     }
 }
