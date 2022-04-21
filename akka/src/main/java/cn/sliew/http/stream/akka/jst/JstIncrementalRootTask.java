@@ -1,10 +1,10 @@
 package cn.sliew.http.stream.akka.jst;
 
-import akka.japi.Pair;
 import cn.sliew.http.stream.akka.framework.RootTask;
-import cn.sliew.http.stream.akka.framework.SyncOffsetHelper;
 import cn.sliew.http.stream.common.util.DateUtil;
+import cn.sliew.http.stream.common.util.SyncOffsetHelper;
 import cn.sliew.http.stream.dao.entity.job.JobSyncOffset;
+import cn.sliew.milky.common.collect.Tuple;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -39,12 +39,12 @@ public abstract class JstIncrementalRootTask implements RootTask<JstIncrementalJ
         if (optional.isPresent() == false) {
             return Collections.emptyList();
         }
-        List<Pair<Date, Date>> pairs = SyncOffsetHelper.split(startTime, endTime, optional.get(), 100);
+        List<Tuple<Date, Date>> pairs = SyncOffsetHelper.split(startTime, endTime, optional.get(), 100);
 
         List<JstSubTask> subTasks = new ArrayList<>(pairs.size());
         for (int i = 0; i < pairs.size(); i++) {
-            Pair<Date, Date> pair = pairs.get(i);
-            subTasks.add(buildSubTask(Long.valueOf(i), pair.first(), pair.second()));
+            Tuple<Date, Date> tuple = pairs.get(i);
+            subTasks.add(buildSubTask(Long.valueOf(i), tuple.v1(), tuple.v2()));
         }
         return subTasks;
     }
