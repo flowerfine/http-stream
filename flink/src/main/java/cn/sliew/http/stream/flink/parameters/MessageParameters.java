@@ -1,8 +1,8 @@
 package cn.sliew.http.stream.flink.parameters;
 
 import cn.sliew.http.stream.flink.parsing.PropertyParser;
+import cn.sliew.milky.common.util.JacksonUtil;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -10,6 +10,8 @@ import okhttp3.internal.Util;
 import org.apache.flink.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -56,7 +58,11 @@ public class MessageParameters {
         }
         RequestBody requestBody = Util.EMPTY_REQUEST;
         if (bodys != null && bodys.length > 0) {
-            requestBody = RequestBody.create(MediaType.parse(mediaType), "");
+            Map<String, String> map = new HashMap<>();
+            for (NameValuePair body : bodys) {
+                map.put(body.getName(), body.getValue());
+            }
+            requestBody = RequestBody.create(MediaType.parse(mediaType), JacksonUtil.toJsonString(map));
         }
         builder.method(method, requestBody);
         return builder.build();
