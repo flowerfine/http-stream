@@ -7,7 +7,7 @@ public class HttpSource<T, SplitT extends HttpSourceSplit> implements Source<T, 
 
     @Override
     public Boundedness getBoundedness() {
-        return null;
+        return Boundedness.CONTINUOUS_UNBOUNDED;
     }
 
     @Override
@@ -27,11 +27,11 @@ public class HttpSource<T, SplitT extends HttpSourceSplit> implements Source<T, 
 
     @Override
     public SimpleVersionedSerializer<SplitT> getSplitSerializer() {
-        return null;
+        return (SimpleVersionedSerializer<SplitT>) HttpSourceSplitSerializer.INSTANCE;
     }
 
     @Override
     public SimpleVersionedSerializer<PendingSplitsCheckpoint<SplitT>> getEnumeratorCheckpointSerializer() {
-        return null;
+        return new PendingSplitsCheckpointSerializer(getSplitSerializer());
     }
 }
