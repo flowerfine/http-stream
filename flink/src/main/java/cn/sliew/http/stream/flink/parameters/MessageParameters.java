@@ -1,6 +1,6 @@
 package cn.sliew.http.stream.flink.parameters;
 
-import cn.sliew.http.stream.flink.parsing.PropertyParser;
+import cn.sliew.http.stream.common.parsing.PropertyParser;
 import cn.sliew.milky.common.util.JacksonUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;

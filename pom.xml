@@ -16,6 +16,7 @@
     <description>http stream</description>
 
     <modules>
+        <module>common</module>
         <module>dao</module>
         <module>remote</module>
         <module>format</module>
@@ -37,6 +38,7 @@
         <scala.binary.version>2.12</scala.binary.version>
         <arrow.version>7.0.0</arrow.version>
         <seatunnel.version>2.1.0</seatunnel.version>
+        <milky.version>1.0.6_8</milky.version>
     </properties>
 
     <dependencies>
@@ -67,6 +69,11 @@
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>dao</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -95,6 +102,12 @@
                 <groupId>org.apache.arrow</groupId>
                 <artifactId>arrow-vector</artifactId>
                 <version>${arrow.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.sliew</groupId>
+                <artifactId>milky-common</artifactId>
+                <version>${milky.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

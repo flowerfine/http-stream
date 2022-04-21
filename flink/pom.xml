@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-core</artifactId>
             <version>${flink.version}</version>
@@ -37,13 +42,6 @@
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>cn.sliew</groupId>
-            <artifactId>milky-common</artifactId>
-            <version>1.0.6_8</version>
-        </dependency>
-
     </dependencies>
 
 </project>

@@ -13,29 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package cn.sliew.http.stream.flink.parsing;
+package cn.sliew.http.stream.common.parsing;
 
 /**
  * forked from <a href="https://github.com/mybatis/mybatis-3/tree/master/src/main/java/org/apache/ibatis/parsing">mybatis</>
  *
  * @author Clinton Begin
  */
-public class ParsingException extends RuntimeException {
-    private static final long serialVersionUID = -176685891441325943L;
-
-    public ParsingException() {
-        super();
-    }
-
-    public ParsingException(String message) {
-        super(message);
-    }
-
-    public ParsingException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ParsingException(Throwable cause) {
-        super(cause);
-    }
+public interface TokenHandler {
+    String handleToken(String content);
 }

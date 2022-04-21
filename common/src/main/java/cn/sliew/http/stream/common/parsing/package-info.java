@@ -13,13 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package cn.sliew.http.stream.flink.parsing;
-
 /**
  * forked from <a href="https://github.com/mybatis/mybatis-3/tree/master/src/main/java/org/apache/ibatis/parsing">mybatis</>
- *
- * @author Clinton Begin
+ * Parsing utils.
  */
-public interface TokenHandler {
-    String handleToken(String content);
-}
+package cn.sliew.http.stream.common.parsing;
