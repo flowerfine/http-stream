@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.flink.reader;
+package cn.sliew.http.stream.flink.impl;
 
 import cn.sliew.http.stream.flink.HttpSourceSplit;
 import cn.sliew.http.stream.flink.HttpSourceSplitState;
