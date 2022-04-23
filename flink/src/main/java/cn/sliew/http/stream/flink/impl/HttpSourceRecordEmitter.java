@@ -15,6 +15,6 @@ public class HttpSourceRecordEmitter<T, SplitT extends HttpSourceSplit>
             SourceOutput<T> output,
             HttpSourceSplitState<SplitT> splitState) throws Exception {
         elements.getRecords().forEach(output::collect);
-        splitState.setPosition(elements.getPageIndex(), elements.getPageSize());
+        splitState.setPosition(elements.getPosition());
     }
 }
