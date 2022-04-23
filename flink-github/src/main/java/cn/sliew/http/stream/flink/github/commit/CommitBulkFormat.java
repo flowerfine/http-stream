@@ -2,7 +2,7 @@ package cn.sliew.http.stream.flink.github.commit;
 
 import cn.sliew.http.stream.flink.HttpSourceSplit;
 import cn.sliew.http.stream.flink.github.MessageParameters;
-import cn.sliew.http.stream.flink.reader.StreamFormat;
+import cn.sliew.http.stream.flink.reader.BulkFormat;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
@@ -21,14 +21,14 @@ import java.io.IOException;
  * @param <T>
  * @see JsonRowSchemaConverter
  */
-public class CommitStreamFormat<T> implements StreamFormat<T, HttpSourceSplit> {
+public class CommitBulkFormat<T> implements BulkFormat<T, HttpSourceSplit> {
 
     private final ObjectMapper objectMapper;
     private final TypeInformation<T> typeInformation;
     private final OkHttpClient client;
     private final MessageParameters parameters;
 
-    public CommitStreamFormat(ObjectMapper objectMapper, TypeInformation<T> typeInformation, OkHttpClient client, MessageParameters parameters) {
+    public CommitBulkFormat(ObjectMapper objectMapper, TypeInformation<T> typeInformation, OkHttpClient client, MessageParameters parameters) {
         this.objectMapper = objectMapper;
         this.typeInformation = typeInformation;
         this.client = client;
@@ -78,7 +78,7 @@ public class CommitStreamFormat<T> implements StreamFormat<T, HttpSourceSplit> {
 
         @Nullable
         @Override
-        public T read() throws IOException {
+        public RecordIterator<T> readBatch() throws IOException {
             while (iterator.hasNext()) {
                 return iterator.next();
             }
