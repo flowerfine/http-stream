@@ -1,7 +1,7 @@
 package cn.sliew.http.stream.flink;
 
-import cn.sliew.http.stream.flink.assigners.IntervalAssigner;
-import cn.sliew.http.stream.flink.assigners.SimpleIntervalAssigner;
+import cn.sliew.http.stream.flink.assigners.HttpSourceSplitAssigner;
+import cn.sliew.http.stream.flink.assigners.SimpleHttpSourceSplitAssigner;
 import cn.sliew.http.stream.flink.enumerator.HttpSourceSplitEnumerator;
 import cn.sliew.http.stream.flink.impl.HttpEnumerator;
 import cn.sliew.http.stream.flink.util.CheckpointedPosition;
@@ -16,6 +16,7 @@ public class HttpSource<T, SplitT extends HttpSourceSplit>
         implements Source<T, SplitT, PendingSplitsCheckpoint<SplitT>> {
 
     private final HttpSourceSplitEnumerator.Provider splitEnumeratorFactory = null;
+    private final HttpSourceSplitAssigner.Provider splitAssignerFactory = splits -> new SimpleHttpSourceSplitAssigner(new ArrayList(splits));
     private final CheckpointedPosition.Provider checkpointedPositionFactory = null;
 
     private final HttpSourceParameters parameters = null;
@@ -49,8 +50,8 @@ public class HttpSource<T, SplitT extends HttpSourceSplit>
             HttpSourceSplitEnumerator splitEnumerator,
             Collection<SplitT> splits) {
 
-        IntervalAssigner<SplitT> intervalAssigner = new SimpleIntervalAssigner(new ArrayList<>(splits));
-        return new HttpEnumerator<>(context, splitEnumerator, intervalAssigner, parameters);
+        HttpSourceSplitAssigner splitAssigner = splitAssignerFactory.create((Collection<HttpSourceSplit>) splits);
+        return new HttpEnumerator<>(context, splitEnumerator, splitAssigner, parameters);
     }
 
     @Override

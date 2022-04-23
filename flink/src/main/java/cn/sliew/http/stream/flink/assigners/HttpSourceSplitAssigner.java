@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Optional;
 
-public interface IntervalAssigner<SplitT extends HttpSourceSplit> {
+public interface HttpSourceSplitAssigner<SplitT extends HttpSourceSplit> {
 
     /**
      * Gets the next split.
@@ -38,6 +38,6 @@ public interface IntervalAssigner<SplitT extends HttpSourceSplit> {
         /**
          * Creates a new {@code IntervalAssigner} that starts with the given set of initial splits.
          */
-        IntervalAssigner create(Collection<HttpSourceSplit> initialSplits);
+        HttpSourceSplitAssigner create(Collection<HttpSourceSplit> initialSplits);
     }
 }

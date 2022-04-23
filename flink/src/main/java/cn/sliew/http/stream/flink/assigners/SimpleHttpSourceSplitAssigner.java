@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
-public class SimpleIntervalAssigner<SplitT extends HttpSourceSplit>
-        implements IntervalAssigner<SplitT> {
+public class SimpleHttpSourceSplitAssigner<SplitT extends HttpSourceSplit>
+        implements HttpSourceSplitAssigner<SplitT> {
 
     private final ArrayList<SplitT> splits;
 
-    public SimpleIntervalAssigner(ArrayList<SplitT> splits) {
+    public SimpleHttpSourceSplitAssigner(ArrayList<SplitT> splits) {
         this.splits = splits;
     }
 
