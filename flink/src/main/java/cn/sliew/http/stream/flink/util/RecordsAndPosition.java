@@ -7,14 +7,11 @@ import java.util.Collection;
 @Getter
 public class RecordsAndPosition<E> {
 
-    private Collection<E> records;
+    private final Collection<E> records;
+    private final CheckpointedPosition position;
 
-    private long pageIndex;
-    private long pageSize;
-
-    public RecordsAndPosition(Collection<E> records, long pageIndex, long pageSize) {
+    public RecordsAndPosition(Collection<E> records, CheckpointedPosition position) {
         this.records = records;
-        this.pageIndex = pageIndex;
-        this.pageSize = pageSize;
+        this.position = position;
     }
 }

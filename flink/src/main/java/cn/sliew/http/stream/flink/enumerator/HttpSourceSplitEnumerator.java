@@ -1,14 +1,14 @@
 package cn.sliew.http.stream.flink.enumerator;
 
 import cn.sliew.http.stream.flink.HttpSourceSplit;
+import cn.sliew.http.stream.flink.util.HttpSourceParameters;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Date;
 
-public interface IntervalEnumerator<SplitT extends HttpSourceSplit> {
+public interface HttpSourceSplitEnumerator<SplitT extends HttpSourceSplit> {
 
-    Collection<SplitT> enumerateSplits(Date startTime, Date endTime);
+    Collection<SplitT> enumerateSplits(HttpSourceParameters parameters);
 
     /**
      * Factory for the {@code HttpSourceEnumerator}.
@@ -16,6 +16,6 @@ public interface IntervalEnumerator<SplitT extends HttpSourceSplit> {
     @FunctionalInterface
     interface Provider extends Serializable {
 
-        IntervalEnumerator create();
+        HttpSourceSplitEnumerator create();
     }
 }

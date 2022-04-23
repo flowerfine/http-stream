@@ -1,12 +1,13 @@
 package cn.sliew.http.stream.flink.enumerator;
 
 import cn.sliew.http.stream.flink.HttpSourceSplit;
-import org.apache.flink.api.java.tuple.Tuple2;
+import cn.sliew.http.stream.flink.util.HttpSourceParameters;
+import cn.sliew.http.stream.flink.util.SplitHelper;
 
-import java.util.*;
+import java.util.Collection;
 
-public class NonSplittingIntervalEnumerator<SplitT extends HttpSourceSplit>
-        implements IntervalEnumerator<SplitT> {
+public class HttpSourceSplitEnumeratorImpl<SplitT extends HttpSourceSplit>
+        implements HttpSourceSplitEnumerator<SplitT> {
 
     /**
      * The current Id as a mutable string representation. This covers more values than the integer
@@ -14,19 +15,15 @@ public class NonSplittingIntervalEnumerator<SplitT extends HttpSourceSplit>
      */
     private final char[] currentId = "0000000000".toCharArray();
 
-    @Override
-    public Collection<SplitT> enumerateSplits(Date startTime, Date endTime) {
-        List<Tuple2<Date, Date>> tuple2s = split(startTime, endTime);
-        List<HttpSourceSplit> splits = new ArrayList<>(tuple2s.size());
-        for (Tuple2<Date, Date> tuple2 : tuple2s) {
-            HttpSourceSplit split = new HttpSourceSplit(getNextId(), tuple2.f0, tuple2.f1);
-            splits.add(split);
-        }
-        return (Collection<SplitT>) Collections.unmodifiableCollection(splits);
+    private final SplitHelper<SplitT> helper;
+
+    public HttpSourceSplitEnumeratorImpl(SplitHelper<SplitT> helper) {
+        this.helper = helper;
     }
 
-    protected List<Tuple2<Date, Date>> split(Date startTime, Date endTime) {
-        return Collections.singletonList(new Tuple2<>(startTime, endTime));
+    @Override
+    public Collection<SplitT> enumerateSplits(HttpSourceParameters parameters) {
+        return helper.split(() -> getNextId(), parameters);
     }
 
     protected final String getNextId() {

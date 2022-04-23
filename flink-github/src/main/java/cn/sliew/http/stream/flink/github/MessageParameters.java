@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.flink.parameters;
+package cn.sliew.http.stream.flink.github;
 
 import cn.sliew.http.stream.common.parsing.PropertyParser;
 import cn.sliew.milky.common.util.JacksonUtil;
@@ -32,7 +32,7 @@ public class MessageParameters {
      * 解析 url 中的占位符
      * 绑定 query
      */
-    public String getUrl() {
+    private String getUrl() {
         Properties properties = new Properties();
         for (NameValuePair path : paths) {
             properties.put(path.getName(), path.getValue());

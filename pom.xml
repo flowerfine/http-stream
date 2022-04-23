@@ -23,6 +23,7 @@
         <module>akka</module>
         <module>web</module>
         <module>flink</module>
+        <module>flink-github</module>
     </modules>
 
     <properties>
@@ -39,6 +40,7 @@
         <arrow.version>7.0.0</arrow.version>
         <seatunnel.version>2.1.0</seatunnel.version>
         <milky.version>1.0.6_8</milky.version>
+        <flink.version>1.13.6</flink.version>
     </properties>
 
     <dependencies>

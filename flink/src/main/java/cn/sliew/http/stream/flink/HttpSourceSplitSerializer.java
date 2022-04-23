@@ -25,26 +25,29 @@ import org.apache.flink.core.memory.DataInputDeserializer;
 import org.apache.flink.core.memory.DataOutputSerializer;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Optional;
 
 import static org.apache.flink.util.Preconditions.checkArgument;
 
 /**
  * A serializer for the {@link HttpSourceSplit}.
+ *
  * @see FileSourceSplitSerializer
  */
 @PublicEvolving
 public final class HttpSourceSplitSerializer implements SimpleVersionedSerializer<HttpSourceSplit> {
-
-    public static final HttpSourceSplitSerializer INSTANCE = new HttpSourceSplitSerializer();
 
     private static final ThreadLocal<DataOutputSerializer> SERIALIZER_CACHE =
             ThreadLocal.withInitial(() -> new DataOutputSerializer(64));
 
     private static final int VERSION = 1;
 
+    private final CheckpointedPosition.Provider provider;
+
     // ------------------------------------------------------------------------
+
+    public HttpSourceSplitSerializer(CheckpointedPosition.Provider provider) {
+        this.provider = provider;
+    }
 
     @Override
     public int getVersion() {
@@ -64,15 +67,10 @@ public final class HttpSourceSplitSerializer implements SimpleVersionedSerialize
 
         final DataOutputSerializer out = SERIALIZER_CACHE.get();
         out.writeUTF(split.splitId());
-        out.writeLong(split.getStartTime().getTime());
-        out.writeLong(split.getEndTime().getTime());
 
-        final Optional<CheckpointedPosition> readerPosition = split.getPosition();
-        out.writeBoolean(readerPosition.isPresent());
-        if (readerPosition.isPresent()) {
-            out.writeLong(readerPosition.get().getPageIndex());
-            out.writeLong(readerPosition.get().getPageSize());
-        }
+        final CheckpointedPosition position = split.getPosition();
+        position.write(out);
+
         final byte[] result = out.getCopyOfBuffer();
         out.clear();
 
@@ -85,23 +83,21 @@ public final class HttpSourceSplitSerializer implements SimpleVersionedSerialize
 
     @Override
     public HttpSourceSplit deserialize(int version, byte[] serialized) throws IOException {
-        if (version == 1) {
+        if (version == getVersion()) {
             return deserializeV1(serialized);
         }
         throw new IOException("Unknown version: " + version);
     }
 
-    private static HttpSourceSplit deserializeV1(byte[] serialized) throws IOException {
+    private HttpSourceSplit deserializeV1(byte[] serialized) throws IOException {
         final DataInputDeserializer in = new DataInputDeserializer(serialized);
         final String splitId = in.readUTF();
-        final Date startTime = new Date(in.readLong());
-        final Date endTime = new Date(in.readLong());
 
-        final CheckpointedPosition readerPosition =
-                in.readBoolean() ? new CheckpointedPosition(in.readLong(), in.readLong()) : null;
+        CheckpointedPosition position = provider.create();
+        position.read(in);
 
         // instantiate a new split and cache the serialized form
-        return new HttpSourceSplit(splitId, startTime, endTime, readerPosition, serialized);
+        return new HttpSourceSplit(splitId, position, serialized);
     }
 
 }

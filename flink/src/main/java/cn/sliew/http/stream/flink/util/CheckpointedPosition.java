@@ -18,28 +18,21 @@
 
 package cn.sliew.http.stream.flink.util;
 
+import org.apache.flink.core.io.IOReadableWritable;
+
 import java.io.Serializable;
 
 /**
  * The position of a reader, to be stored in a checkpoint.
  */
-public final class CheckpointedPosition implements Serializable {
+public interface CheckpointedPosition extends IOReadableWritable, Serializable {
 
-    private static final long serialVersionUID = 1L;
+    /**
+     * Factory for the {@code CheckpointedPosition}.
+     */
+    @FunctionalInterface
+    interface Provider extends Serializable {
 
-    private final long pageIndex;
-    private final long pageSize;
-
-    public CheckpointedPosition(long pageIndex, long pageSize) {
-        this.pageIndex = pageIndex;
-        this.pageSize = pageSize;
-    }
-
-    public long getPageIndex() {
-        return pageIndex;
-    }
-
-    public long getPageSize() {
-        return pageSize;
+        CheckpointedPosition create();
     }
 }

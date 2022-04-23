@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.flink.parameters;
+package cn.sliew.http.stream.flink.github;
 
 import lombok.Getter;
 

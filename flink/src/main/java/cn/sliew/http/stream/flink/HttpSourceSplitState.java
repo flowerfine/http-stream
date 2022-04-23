@@ -1,42 +1,36 @@
 package cn.sliew.http.stream.flink;
 
 import cn.sliew.http.stream.flink.util.CheckpointedPosition;
+import cn.sliew.milky.common.exception.Rethrower;
+import org.apache.flink.util.InstantiationUtil;
 
-import java.util.Optional;
+import java.io.IOException;
 
 public abstract class HttpSourceSplitState<SplitT extends HttpSourceSplit> {
 
     private final SplitT split;
-    private long pageIndex;
-    private long pageSize;
+    private CheckpointedPosition position;
 
     public HttpSourceSplitState(SplitT split) {
         this.split = split;
-        final Optional<CheckpointedPosition> position = split.getPosition();
-        if (position.isPresent()) {
-            this.pageIndex = position.get().getPageIndex();
-            this.pageSize = position.get().getPageSize();
-        } else {
-            this.pageIndex = 1L;
-            this.pageSize = 10L;
-        }
+        this.position = split.getPosition();
     }
 
-    public long getPageIndex() {
-        return pageIndex;
+    public CheckpointedPosition getPosition() {
+        return position;
     }
 
-    public long getPageSize() {
-        return pageSize;
-    }
-
-    public void setPosition(long pageIndex, long pageSize) {
-        this.pageIndex = pageIndex;
-        this.pageSize = pageSize;
+    public void setPosition(CheckpointedPosition position) {
+        this.position = position;
     }
 
     public SplitT toSourceSplit() {
-        CheckpointedPosition position = new CheckpointedPosition(pageIndex, pageSize);
-        return (SplitT) split.updateWithCheckpointedPosition(position);
+        try {
+            CheckpointedPosition copyed = InstantiationUtil.clone(position);
+            return (SplitT) split.updateWithCheckpointedPosition(copyed);
+        } catch (IOException | ClassNotFoundException e) {
+            Rethrower.throwAs(e);
+        }
+        return null;
     }
 }

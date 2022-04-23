@@ -1,10 +1,10 @@
 package cn.sliew.http.stream.flink.impl;
 
-import cn.sliew.http.stream.common.util.DateUtil;
 import cn.sliew.http.stream.flink.HttpSourceSplit;
 import cn.sliew.http.stream.flink.PendingSplitsCheckpoint;
 import cn.sliew.http.stream.flink.assigners.IntervalAssigner;
-import cn.sliew.http.stream.flink.enumerator.IntervalEnumerator;
+import cn.sliew.http.stream.flink.enumerator.HttpSourceSplitEnumerator;
+import cn.sliew.http.stream.flink.util.HttpSourceParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.connector.source.SplitEnumerator;
 import org.apache.flink.api.connector.source.SplitEnumeratorContext;
@@ -18,25 +18,24 @@ public class HttpEnumerator<SplitT extends HttpSourceSplit>
         implements SplitEnumerator<SplitT, PendingSplitsCheckpoint<SplitT>> {
 
     private final SplitEnumeratorContext<SplitT> context;
-    private final IntervalEnumerator<SplitT> intervalEnumerator;
+    private final HttpSourceSplitEnumerator<SplitT> splitEnumerator;
     private final IntervalAssigner intervalAssigner;
-
-    private final Date startTime;
+    private final HttpSourceParameters parameters;
 
     private final LinkedHashMap<Integer, String> readersAwaitingSplit;
 
-    public HttpEnumerator(SplitEnumeratorContext<SplitT> context, IntervalEnumerator<SplitT> intervalEnumerator, IntervalAssigner intervalAssigner, Date startTime) {
+    public HttpEnumerator(SplitEnumeratorContext<SplitT> context, HttpSourceSplitEnumerator<SplitT> splitEnumerator, IntervalAssigner intervalAssigner, HttpSourceParameters parameters) {
         this.context = context;
-        this.intervalEnumerator = intervalEnumerator;
+        this.splitEnumerator = splitEnumerator;
         this.intervalAssigner = intervalAssigner;
-        this.startTime = startTime;
+        this.parameters = parameters;
 
         this.readersAwaitingSplit = new LinkedHashMap<>();
     }
 
     @Override
     public void start() {
-        Collection<SplitT> splitTS = intervalEnumerator.enumerateSplits(startTime, DateUtil.lastSecond());
+        Collection<SplitT> splitTS = splitEnumerator.enumerateSplits(parameters);
         intervalAssigner.addSplits(splitTS);
     }
 

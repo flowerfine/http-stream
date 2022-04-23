@@ -5,16 +5,14 @@ import org.apache.flink.api.connector.source.SourceSplit;
 
 import javax.annotation.Nullable;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Optional;
+
+import static org.apache.flink.util.Preconditions.checkNotNull;
 
 public class HttpSourceSplit implements SourceSplit, Serializable {
 
     private static final long serialVersionUID = 6348086794567295161L;
 
     private final String id;
-    private final Date startTime;
-    private final Date endTime;
 
     private CheckpointedPosition position;
 
@@ -25,19 +23,13 @@ public class HttpSourceSplit implements SourceSplit, Serializable {
     @Nullable
     transient byte[] serializedFormCache;
 
-    public HttpSourceSplit(String id, Date startTime, Date endTime) {
-        this(id, startTime, endTime, null);
+    public HttpSourceSplit(String id, CheckpointedPosition position) {
+        this(id, position, null);
     }
 
-    public HttpSourceSplit(String id, Date startTime, Date endTime, @Nullable CheckpointedPosition position) {
-        this(id, startTime, endTime, position, null);
-    }
-
-    public HttpSourceSplit(String id, Date startTime, Date endTime, CheckpointedPosition position, @Nullable byte[] serializedFormCache) {
+    public HttpSourceSplit(String id, CheckpointedPosition position, @Nullable byte[] serializedFormCache) {
         this.id = id;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.position = position;
+        this.position = checkNotNull(position);
         this.serializedFormCache = serializedFormCache;
     }
 
@@ -46,19 +38,11 @@ public class HttpSourceSplit implements SourceSplit, Serializable {
         return id;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public CheckpointedPosition getPosition() {
+        return position;
     }
 
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public Optional<CheckpointedPosition> getPosition() {
-        return Optional.ofNullable(position);
-    }
-
-    public HttpSourceSplit updateWithCheckpointedPosition(@Nullable CheckpointedPosition position) {
-        return new HttpSourceSplit(id, startTime, endTime, position);
+    public HttpSourceSplit updateWithCheckpointedPosition(CheckpointedPosition position) {
+        return new HttpSourceSplit(id, position);
     }
 }
