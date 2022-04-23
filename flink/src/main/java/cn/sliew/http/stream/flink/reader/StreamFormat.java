@@ -19,7 +19,9 @@ public interface StreamFormat<T, SplitT extends HttpSourceSplit>
 
     Reader<T> restoreReader(Configuration config, SplitT splitT) throws IOException;
 
-    boolean isSplittable();
+    default boolean isSplittable() {
+        return false;
+    }
 
     @Override
     TypeInformation<T> getProducedType();
