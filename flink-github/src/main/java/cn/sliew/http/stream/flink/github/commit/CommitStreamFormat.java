@@ -3,7 +3,6 @@ package cn.sliew.http.stream.flink.github.commit;
 import cn.sliew.http.stream.flink.HttpSourceSplit;
 import cn.sliew.http.stream.flink.github.MessageParameters;
 import cn.sliew.http.stream.flink.reader.StreamFormat;
-import cn.sliew.http.stream.flink.util.CheckpointedPosition;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
@@ -15,8 +14,6 @@ import org.apache.flink.formats.json.JsonRowSchemaConverter;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Optional;
 
 /**
  * 接口返回数据转换为读取，参考 flink json 和 csv 的实现，杂糅在一块
@@ -40,12 +37,12 @@ public class CommitStreamFormat<T> implements StreamFormat<T, HttpSourceSplit> {
 
     @Override
     public Reader<T> createReader(Configuration config, HttpSourceSplit split) throws IOException {
-        return new PageReader<>(split.getStartTime(), split.getEndTime(), split.getPosition());
+        return new PageReader(split);
     }
 
     @Override
     public Reader<T> restoreReader(Configuration config, HttpSourceSplit split) throws IOException {
-        return new PageReader<>(split.getStartTime(), split.getEndTime(), split.getPosition());
+        return new PageReader<>(split);
     }
 
     @Override
@@ -60,9 +57,11 @@ public class CommitStreamFormat<T> implements StreamFormat<T, HttpSourceSplit> {
 
     private class PageReader<T> implements Reader<T> {
 
+        private HttpSourceSplit split;
         private MappingIterator<T> iterator;
 
-        public PageReader(Date startTime, Date endTime, Optional<CheckpointedPosition> position) throws IOException {
+        public PageReader(HttpSourceSplit split) throws IOException {
+            this.split = split;
             fetchData();
         }
 
