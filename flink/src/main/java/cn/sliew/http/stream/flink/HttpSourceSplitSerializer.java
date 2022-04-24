@@ -19,12 +19,14 @@
 package cn.sliew.http.stream.flink;
 
 import cn.sliew.http.stream.flink.util.CheckpointedPosition;
+import cn.sliew.http.stream.flink.util.HttpSourceParameters;
 import org.apache.flink.annotation.PublicEvolving;
 import org.apache.flink.core.io.SimpleVersionedSerializer;
 import org.apache.flink.core.memory.DataInputDeserializer;
 import org.apache.flink.core.memory.DataOutputSerializer;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.apache.flink.util.Preconditions.checkArgument;
 
@@ -68,8 +70,14 @@ public final class HttpSourceSplitSerializer implements SimpleVersionedSerialize
         final DataOutputSerializer out = SERIALIZER_CACHE.get();
         out.writeUTF(split.splitId());
 
-        final CheckpointedPosition position = split.getPosition();
-        position.write(out);
+        final HttpSourceParameters parameters = split.getParameters();
+        parameters.write(out);
+
+        final Optional<CheckpointedPosition> position = split.getPosition();
+        out.writeBoolean(position.isPresent());
+        if (position.isPresent()) {
+            position.get().write(out);
+        }
 
         final byte[] result = out.getCopyOfBuffer();
         out.clear();
@@ -93,11 +101,17 @@ public final class HttpSourceSplitSerializer implements SimpleVersionedSerialize
         final DataInputDeserializer in = new DataInputDeserializer(serialized);
         final String splitId = in.readUTF();
 
-        CheckpointedPosition position = provider.create();
-        position.read(in);
+        final HttpSourceParameters parameters = new HttpSourceParameters();
+        parameters.read(in);
+
+        CheckpointedPosition position = null;
+        if (in.readBoolean()) {
+            position = provider.create();
+            position.read(in);
+        }
 
         // instantiate a new split and cache the serialized form
-        return new HttpSourceSplit(splitId, position, serialized);
+        return new HttpSourceSplit(splitId, parameters, position, serialized);
     }
 
 }

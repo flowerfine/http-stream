@@ -13,7 +13,7 @@ public class HttpSourceSplitState<SplitT extends HttpSourceSplit> {
 
     public HttpSourceSplitState(SplitT split) {
         this.split = split;
-        this.position = split.getPosition();
+        this.position = split.getPosition().orElse(null);
     }
 
     public CheckpointedPosition getPosition() {
