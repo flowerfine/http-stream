@@ -4,6 +4,8 @@ import cn.sliew.http.stream.flink.assigners.HttpSourceSplitAssigner;
 import cn.sliew.http.stream.flink.assigners.SimpleHttpSourceSplitAssigner;
 import cn.sliew.http.stream.flink.enumerator.HttpSourceSplitEnumerator;
 import cn.sliew.http.stream.flink.impl.HttpEnumerator;
+import cn.sliew.http.stream.flink.impl.HttpSourceReader;
+import cn.sliew.http.stream.flink.reader.BulkFormat;
 import cn.sliew.http.stream.flink.util.CheckpointedPosition;
 import cn.sliew.http.stream.flink.util.HttpSourceParameters;
 import org.apache.flink.api.connector.source.*;
@@ -18,6 +20,7 @@ public class HttpSource<T, SplitT extends HttpSourceSplit>
     private final HttpSourceSplitEnumerator.Provider splitEnumeratorFactory = null;
     private final HttpSourceSplitAssigner.Provider splitAssignerFactory = splits -> new SimpleHttpSourceSplitAssigner(new ArrayList(splits));
     private final CheckpointedPosition.Provider checkpointedPositionFactory = null;
+    private final BulkFormat<T, SplitT> readerFormat = null;
 
     private final HttpSourceParameters parameters = null;
 
@@ -27,8 +30,9 @@ public class HttpSource<T, SplitT extends HttpSourceSplit>
     }
 
     @Override
-    public SourceReader<T, SplitT> createReader(SourceReaderContext sourceReaderContext) throws Exception {
-        return null;
+    public SourceReader<T, SplitT> createReader(SourceReaderContext context) throws Exception {
+        return new HttpSourceReader<>(
+                context, readerFormat, context.getConfiguration());
     }
 
     @Override
