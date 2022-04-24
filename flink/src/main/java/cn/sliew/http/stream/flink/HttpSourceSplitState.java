@@ -6,7 +6,7 @@ import org.apache.flink.util.InstantiationUtil;
 
 import java.io.IOException;
 
-public abstract class HttpSourceSplitState<SplitT extends HttpSourceSplit> {
+public class HttpSourceSplitState<SplitT extends HttpSourceSplit> {
 
     private final SplitT split;
     private CheckpointedPosition position;

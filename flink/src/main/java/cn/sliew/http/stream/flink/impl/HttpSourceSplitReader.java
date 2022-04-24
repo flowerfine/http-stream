@@ -1,6 +1,7 @@
 package cn.sliew.http.stream.flink.impl;
 
 import cn.sliew.http.stream.flink.HttpSourceSplit;
+import cn.sliew.http.stream.flink.reader.BulkFormat;
 import cn.sliew.http.stream.flink.util.RecordsAndPosition;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.connector.base.source.reader.RecordsWithSplitIds;
@@ -20,7 +21,7 @@ public class HttpSourceSplitReader <T, SplitT extends HttpSourceSplit>
     private final Queue<SplitT> splits;
 
     @Nullable
-    private Reader<T> currentReader;
+    private BulkFormat.Reader<T> currentReader;
     @Nullable
     private String currentSplitId;
 
