@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.saasquatch.jsonschemainferrer.*;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.*;
 import org.apache.arrow.vector.complex.ListVector;
@@ -25,25 +24,25 @@ public enum JsonToArrowUtils {
     ;
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final JsonSchemaInferrer inferrer = JsonSchemaInferrer.newBuilder()
-            .setSpecVersion(SpecVersion.DRAFT_06)
-            // Requires commons-validator
-            .addFormatInferrers(FormatInferrers.email(), FormatInferrers.ip())
-            .setAdditionalPropertiesPolicy(AdditionalPropertiesPolicies.notAllowed())
-            .setRequiredPolicy(RequiredPolicies.nonNullCommonFields())
-            .addEnumExtractors(EnumExtractors.validEnum(java.time.Month.class),
-                    EnumExtractors.validEnum(java.time.DayOfWeek.class))
-            .build();
+//    private static final JsonSchemaInferrer inferrer = JsonSchemaInferrer.newBuilder()
+//            .setSpecVersion(SpecVersion.DRAFT_06)
+//            // Requires commons-validator
+//            .addFormatInferrers(FormatInferrers.email(), FormatInferrers.ip())
+//            .setAdditionalPropertiesPolicy(AdditionalPropertiesPolicies.notAllowed())
+//            .setRequiredPolicy(RequiredPolicies.nonNullCommonFields())
+//            .addEnumExtractors(EnumExtractors.validEnum(java.time.Month.class),
+//                    EnumExtractors.validEnum(java.time.DayOfWeek.class))
+//            .build();
 
     private static final SkipConsumer skipConsumer = new SkipConsumer(parser -> parser.nextToken());
 
     /**
      * https://github.com/saasquatch/json-schema-inferrer
      */
-    public static JsonNode inferJsonSchema(String json) throws JsonProcessingException {
-        JsonNode data = mapper.readTree(json);
-        return inferrer.inferForSample(data);
-    }
+//    public static JsonNode inferJsonSchema(String json) throws JsonProcessingException {
+//        JsonNode data = mapper.readTree(json);
+//        return inferrer.inferForSample(data);
+//    }
 
     static CompositeJsonConsumer createCompositeConsumer(ObjectNode schema, JsonToArrowConfig config) {
         List<Consumer> consumers = new ArrayList<>();

@@ -34,11 +34,11 @@
             <artifactId>jackson-module-jsonSchema</artifactId>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.github.saasquatch</groupId>
             <artifactId>json-schema-inferrer</artifactId>
             <version>0.1.4</version>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
 </project>

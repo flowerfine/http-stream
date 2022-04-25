@@ -45,14 +45,14 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
 
     private void initialize() {
         // create consumers
-        compositeConsumer = JsonToArrowUtils.createCompositeConsumer(schema, config);
-        List<FieldVector> vectors = new ArrayList<>();
-        compositeConsumer.getConsumers().forEach(c -> vectors.add(c.getVector()));
-        List<Field> fields = vectors.stream().map(t -> t.getField()).collect(Collectors.toList());
-        VectorSchemaRoot root = new VectorSchemaRoot(fields, vectors, 0);
-        rootSchema = root.getSchema();
+//        compositeConsumer = JsonToArrowUtils.createCompositeConsumer(schema, config);
+//        List<FieldVector> vectors = new ArrayList<>();
+//        compositeConsumer.getConsumers().forEach(c -> vectors.add(c.getVector()));
+//        List<Field> fields = vectors.stream().map(t -> t.getField()).collect(Collectors.toList());
+//        VectorSchemaRoot root = new VectorSchemaRoot(fields, vectors, 0);
+//        rootSchema = root.getSchema();
 
-        load(root);
+//        load(root);
     }
 
     @Override
