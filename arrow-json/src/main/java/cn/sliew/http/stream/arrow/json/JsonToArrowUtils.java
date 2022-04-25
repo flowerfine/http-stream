@@ -61,12 +61,20 @@ public enum JsonToArrowUtils {
         return new Schema(fields);
     }
 
+    /**
+     *
+     * @param node
+     * @return
+     * @see Consts.Types
+     */
     private static ArrowType getFieldType(JsonNode node) {
         String type = node.get("type").asText();
         switch (type) {
             case "string":
                 break;
             case "boolean":
+                break;
+            case "integer":
                 break;
             case "number":
                 break;
