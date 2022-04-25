@@ -24,6 +24,7 @@
         <module>web</module>
         <module>flink</module>
         <module>flink-github</module>
+        <module>arrow-json</module>
     </modules>
 
     <properties>
@@ -41,6 +42,7 @@
         <seatunnel.version>2.1.0</seatunnel.version>
         <milky.version>1.0.6_8</milky.version>
         <flink.version>1.13.6</flink.version>
+        <hh.version>${jackson-bom.version}</hh.version>
     </properties>
 
     <dependencies>
@@ -65,6 +67,14 @@
                 <groupId>com.typesafe.akka</groupId>
                 <artifactId>akka-bom_${scala.binary.version}</artifactId>
                 <version>${akka.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson-bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
