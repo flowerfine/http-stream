@@ -1,19 +1,18 @@
 package cn.sliew.http.stream.arrow.json.consumer;
 
 import com.fasterxml.jackson.core.JsonParser;
-import org.apache.arrow.vector.BitVector;
+import org.apache.arrow.vector.NullVector;
 
 import java.io.IOException;
 
-public class BooleanJsonConsumer extends BaseJsonConsumer<BitVector> {
+public class NullJsonConsumer extends BaseJsonConsumer<NullVector>{
 
-    public BooleanJsonConsumer(BitVector vector) {
+    public NullJsonConsumer(NullVector vector) {
         super(vector);
     }
 
     @Override
     public void consume(JsonParser parser) throws IOException {
-        vector.set(currentIndex, parser.getBooleanValue() ? 1 : 0);
         currentIndex++;
     }
 }
