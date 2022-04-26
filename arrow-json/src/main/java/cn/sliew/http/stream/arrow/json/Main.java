@@ -5,7 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.ipc.ArrowFileWriter;
+import org.apache.arrow.vector.ipc.SeekableReadChannel;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -18,9 +22,10 @@ public class Main {
         JsonParser parser = reader.createParser(inputStream);
         final JsonToArrowConfig jsonToArrowConfig = new JsonToArrowConfigBuilder(new RootAllocator()).build();
         final JsonToArrowVectorIterator2 iterator = new JsonToArrowVectorIterator2(parser, jsonToArrowConfig);
-        while (iterator.hasNext()) {
-            final VectorSchemaRoot vectorSchemaRoot = iterator.next();
 
+        while (iterator.hasNext()) {
+            VectorSchemaRoot vectorSchemaRoot = iterator.next();
+            System.out.println(vectorSchemaRoot.getRowCount());
         }
 
     }
