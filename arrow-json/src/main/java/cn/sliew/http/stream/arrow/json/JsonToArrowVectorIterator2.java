@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.util.Preconditions;
 import org.apache.arrow.vector.*;
 import org.apache.arrow.vector.complex.StructVector;
@@ -44,7 +45,7 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
             }
             Preconditions.checkState(jsonToken == JsonToken.START_OBJECT || jsonToken == JsonToken.START_ARRAY);
             if (jsonToken == JsonToken.START_OBJECT) {
-                return loadObject();
+                return inferSchema();
             }
             if (jsonToken == JsonToken.START_ARRAY) {
                 return loadArray();
@@ -56,10 +57,116 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
     }
 
     private void readObject(String fieldName, FieldVector consumerVector) throws IOException {
+        VectorSchemaRoot.create(null, new RootAllocator());
+    }
+
+    private VectorSchemaRoot loadArrays() throws IOException {
+        final JsonToken jsonToken = parser.nextToken();
+        if (jsonToken == JsonToken.START_OBJECT) {
+            // 读取 object
+        }
+        if (jsonToken == JsonToken.VALUE_STRING) {
+            // 读取数组
+        }
+        while (jsonToken != JsonToken.END_ARRAY) {
+            if (jsonToken == JsonToken.START_OBJECT) {
+                // 读取 object
+            }
+        }
+
+        // 读取第一个 object
+        List<Field> fields = new ArrayList<>();
+        List<FieldVector> valueVectors = new ArrayList<>();
+        inferSchema(fields, valueVectors);
+        VectorSchemaRoot vectorSchemaRoot = new VectorSchemaRoot(fields, valueVectors);
+
+
+        return vectorSchemaRoot;
+    }
+
+
+    private void inferSchema(List<Field> fields, List<FieldVector> valueVectors) throws IOException {
+        JsonToken jsonToken = parser.nextToken();
+        String fieldName = "";
+        int i = 0;
+        while (jsonToken != JsonToken.END_OBJECT) {
+            FieldType fieldType = null;
+            FieldVector vector = null;
+            switch (jsonToken) {
+                case FIELD_NAME:
+                    fieldName = parser.getCurrentName();
+                    break;
+                case START_OBJECT:
+                    // 读取 child object
+//                    fieldType = FieldType.notNullable(ArrowType.Struct.INSTANCE);
+//                    vector = new StructVector(fieldName, config.getAllocator(), fieldType, () -> {
+//                    });
+//                    vector.allocateNew();
+//                    consumerObject(fieldName, (StructVector) vector);
+//                    fields.add(new Field(fieldName, fieldType, null));
+//                    valueVectors.add(vector);
+                    skipObject();
+                    break;
+                case END_OBJECT:
+                    break;
+                case START_ARRAY:
+                    loadArray();
+                    break;
+                case END_ARRAY:
+                    break;
+                case VALUE_STRING:
+                    fieldType = FieldType.notNullable(ArrowType.Utf8.INSTANCE);
+                    vector = new VarCharVector(fieldName, fieldType, config.getAllocator());
+                    vector.allocateNew();
+                    consumeJsonToken(fieldName, jsonToken, i++, vector);
+                    fields.add(new Field(fieldName, fieldType, null));
+                    valueVectors.add(vector);
+                    break;
+                case VALUE_FALSE:
+                case VALUE_TRUE:
+                    fieldType = FieldType.notNullable(ArrowType.Bool.INSTANCE);
+                    vector = new BitVector(fieldName, fieldType, config.getAllocator());
+                    vector.allocateNew();
+                    consumeJsonToken(fieldName, jsonToken, i++, vector);
+                    fields.add(new Field(fieldName, fieldType, null));
+                    valueVectors.add(vector);
+                    break;
+                case VALUE_NUMBER_INT:
+                    fieldType = FieldType.notNullable(new ArrowType.Int(32, true));
+                    vector = new IntVector(fieldName, fieldType, config.getAllocator());
+                    vector.allocateNew();
+                    consumeJsonToken(fieldName, jsonToken, i++, vector);
+                    fields.add(new Field(fieldName, fieldType, null));
+                    valueVectors.add(vector);
+                    break;
+                case VALUE_NUMBER_FLOAT:
+                    fieldType = FieldType.notNullable(new ArrowType.FloatingPoint(FloatingPointPrecision.SINGLE));
+                    vector = new Float4Vector(fieldName, fieldType, config.getAllocator());
+                    vector.allocateNew();
+                    consumeJsonToken(fieldName, jsonToken, i++, vector);
+                    fields.add(new Field(fieldName, fieldType, null));
+                    valueVectors.add(vector);
+                    break;
+                case VALUE_NULL:
+                    fieldType = FieldType.notNullable(ArrowType.Null.INSTANCE);
+                    vector = new NullVector(fieldName, fieldType);
+                    i++;
+                    fields.add(new Field(fieldName, fieldType, null));
+                    valueVectors.add(vector);
+                    break;
+                case VALUE_EMBEDDED_OBJECT:
+                case NOT_AVAILABLE:
+                default:
+            }
+            jsonToken = parser.nextToken();
+        }
+    }
+
+    private void inferSchema(VectorSchemaRoot vectorSchemaRoot) {
 
     }
 
-    private VectorSchemaRoot loadObject() throws IOException {
+    private VectorSchemaRoot inferSchema() throws IOException {
         JsonToken jsonToken = parser.nextToken();
         List<Field> fields = new ArrayList<>();
         List<FieldVector> valueVectors = new ArrayList<>();

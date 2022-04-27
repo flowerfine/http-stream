@@ -1,4 +1,4 @@
-package cn.sliew.http.stream.arrow.json;
+package cn.sliew.http.stream.arrow.json.consumer;
 
 import cn.sliew.http.stream.arrow.json.consumer.BaseJsonConsumer;
 import com.fasterxml.jackson.core.JsonParser;
