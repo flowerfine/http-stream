@@ -38,7 +38,10 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
     public VectorSchemaRoot next() {
         Preconditions.checkState(hasNext());
         try {
-            JsonToken jsonToken = parser.nextToken();
+            JsonToken jsonToken = parser.currentToken();
+            if (jsonToken == null) {
+                jsonToken = parser.nextToken();
+            }
             Preconditions.checkState(jsonToken == JsonToken.START_OBJECT || jsonToken == JsonToken.START_ARRAY);
             if (jsonToken == JsonToken.START_OBJECT) {
                 return loadObject();
@@ -132,7 +135,7 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
             }
             jsonToken = parser.nextToken();
         }
-        parser.finishToken();
+        parser.nextToken();
         return new VectorSchemaRoot(fields, valueVectors, 1);
     }
 
