@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, AutoCloseable {
 
@@ -37,9 +36,9 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
 
     @Override
     public VectorSchemaRoot next() {
-        Preconditions.checkArgument(hasNext());
+        Preconditions.checkState(hasNext());
         try {
-            final JsonToken jsonToken = parser.nextToken();
+            JsonToken jsonToken = parser.nextToken();
             Preconditions.checkState(jsonToken == JsonToken.START_OBJECT || jsonToken == JsonToken.START_ARRAY);
             if (jsonToken == JsonToken.START_OBJECT) {
                 return loadObject();
@@ -47,25 +46,8 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
             if (jsonToken == JsonToken.START_ARRAY) {
                 return loadArray();
             }
-            switch (jsonToken) {
-                case FIELD_NAME:
-                case START_OBJECT:
-                case END_OBJECT:
-                case START_ARRAY:
-                case END_ARRAY:
-                case VALUE_STRING:
-                case VALUE_FALSE:
-                case VALUE_TRUE:
-                case VALUE_NUMBER_INT:
-                case VALUE_NUMBER_FLOAT:
-                case VALUE_NULL:
-                case VALUE_EMBEDDED_OBJECT:
-                case NOT_AVAILABLE:
-                default:
-
-            }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return null;
     }
@@ -90,15 +72,20 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
                 case START_OBJECT:
                     // 读取 child object
                     fieldType = FieldType.notNullable(ArrowType.Struct.INSTANCE);
-                    vector = new StructVector(fieldName, config.getAllocator(), fieldType, () -> {});
+                    vector = new StructVector(fieldName, config.getAllocator(), fieldType, () -> {
+                    });
                     vector.allocateNew();
                     consumerObject(fieldName, (StructVector) vector);
                     fields.add(new Field(fieldName, fieldType, null));
                     valueVectors.add(vector);
+                    break;
                 case END_OBJECT:
+                    break;
                 case START_ARRAY:
-                    // 读取 child arrays
+                    loadArray();
+                    break;
                 case END_ARRAY:
+                    break;
                 case VALUE_STRING:
                     fieldType = FieldType.notNullable(ArrowType.Utf8.INSTANCE);
                     vector = new VarCharVector(fieldName, fieldType, config.getAllocator());
@@ -138,12 +125,14 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
                     i++;
                     fields.add(new Field(fieldName, fieldType, null));
                     valueVectors.add(vector);
+                    break;
                 case VALUE_EMBEDDED_OBJECT:
                 case NOT_AVAILABLE:
                 default:
-                    jsonToken = parser.nextToken();
             }
+            jsonToken = parser.nextToken();
         }
+        parser.finishToken();
         return new VectorSchemaRoot(fields, valueVectors, 1);
     }
 
@@ -180,7 +169,8 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
         }
     }
 
-    private void consumerObject(String name, StructVector vector) throws IOException {
+    private void consumerObject(String name, StructVector structVector) throws IOException {
+        List<Field> childFields = new ArrayList<>();
         JsonToken jsonToken = parser.nextToken();
         int vectorIndex = 0;
         String fieldName = "";
@@ -195,40 +185,54 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
                 case END_OBJECT:
                 case START_ARRAY:
                 case END_ARRAY:
+                    throw new IllegalStateException();
                 case VALUE_STRING:
+                    fieldType = FieldType.notNullable(ArrowType.Utf8.INSTANCE);
+                    vector = new VarCharVector(fieldName, fieldType, config.getAllocator());
+                    vector.allocateNew();
+                    consumeJsonToken(fieldName, jsonToken, vectorIndex++, vector);
+                    childFields.add(new Field(fieldName, fieldType, null));
+                    break;
                 case VALUE_FALSE:
                 case VALUE_TRUE:
+                    fieldType = FieldType.notNullable(ArrowType.Bool.INSTANCE);
+                    vector = new BitVector(fieldName, fieldType, config.getAllocator());
+                    vector.allocateNew();
+                    consumeJsonToken(fieldName, jsonToken, vectorIndex++, vector);
+                    childFields.add(new Field(fieldName, fieldType, null));
+                    break;
                 case VALUE_NUMBER_INT:
+                    fieldType = FieldType.notNullable(new ArrowType.Int(32, true));
+                    vector = new IntVector(fieldName, fieldType, config.getAllocator());
+                    vector.allocateNew();
+                    consumeJsonToken(fieldName, jsonToken, vectorIndex++, vector);
+                    childFields.add(new Field(fieldName, fieldType, null));
+                    break;
                 case VALUE_NUMBER_FLOAT:
-                    FieldVector valueVectors = vector.getChildrenFromFields().get(vectorIndex++);
-                    consumeJsonToken(fieldName, jsonToken, vectorIndex, valueVectors);
+                    fieldType = FieldType.notNullable(new ArrowType.FloatingPoint(FloatingPointPrecision.SINGLE));
+                    vector = new Float4Vector(fieldName, fieldType, config.getAllocator());
+                    vector.allocateNew();
+                    consumeJsonToken(fieldName, jsonToken, vectorIndex++, vector);
+                    childFields.add(new Field(fieldName, fieldType, null));
                     break;
                 case VALUE_NULL:
                     fieldType = FieldType.notNullable(ArrowType.Null.INSTANCE);
-                    vector = new NullVector(fieldName, fieldType);
-                    i++;
-                    fields.add(new Field(fieldName, fieldType, null));
-                    valueVectors.add(vector);
+                    vectorIndex++;
+                    childFields.add(new Field(fieldName, fieldType, null));
+                    break;
                 case VALUE_EMBEDDED_OBJECT:
                 case NOT_AVAILABLE:
                 default:
-                    jsonToken = parser.nextToken();
             }
+            jsonToken = parser.nextToken();
         }
-
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            final String childName = entry.getKey();
-            final Object childValue = entry.getValue();
-
-            final String fullChildName = String.format("%s.%s", name, entry.getKey());
-            final FieldVector valueVectors = vector.getChildrenFromFields().get(vectorIndex++);
-        }
+        structVector.initializeChildrenFromFields(childFields);
     }
 
     private VectorSchemaRoot loadArray() throws IOException {
         JsonToken jsonToken = parser.nextToken();
         while (jsonToken != JsonToken.END_ARRAY) {
-
+            jsonToken = parser.nextToken();
         }
         return null;
     }

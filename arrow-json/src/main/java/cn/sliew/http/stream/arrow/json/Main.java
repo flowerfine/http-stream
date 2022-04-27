@@ -5,11 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.VectorSchemaRoot;
-import org.apache.arrow.vector.ipc.ArrowFileWriter;
-import org.apache.arrow.vector.ipc.SeekableReadChannel;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -25,7 +21,7 @@ public class Main {
 
         while (iterator.hasNext()) {
             VectorSchemaRoot vectorSchemaRoot = iterator.next();
-            System.out.println(vectorSchemaRoot.getRowCount());
+            System.out.println("输出转化结果! 数量: " + vectorSchemaRoot.getRowCount());
         }
 
     }
