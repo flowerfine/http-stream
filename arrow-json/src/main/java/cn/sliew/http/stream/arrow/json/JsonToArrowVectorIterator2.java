@@ -74,13 +74,14 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
                     break;
                 case START_OBJECT:
                     // 读取 child object
-                    fieldType = FieldType.notNullable(ArrowType.Struct.INSTANCE);
-                    vector = new StructVector(fieldName, config.getAllocator(), fieldType, () -> {
-                    });
-                    vector.allocateNew();
-                    consumerObject(fieldName, (StructVector) vector);
-                    fields.add(new Field(fieldName, fieldType, null));
-                    valueVectors.add(vector);
+//                    fieldType = FieldType.notNullable(ArrowType.Struct.INSTANCE);
+//                    vector = new StructVector(fieldName, config.getAllocator(), fieldType, () -> {
+//                    });
+//                    vector.allocateNew();
+//                    consumerObject(fieldName, (StructVector) vector);
+//                    fields.add(new Field(fieldName, fieldType, null));
+//                    valueVectors.add(vector);
+                    skipObject();
                     break;
                 case END_OBJECT:
                     break;
@@ -139,6 +140,13 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
         return new VectorSchemaRoot(fields, valueVectors, 1);
     }
 
+    private void skipObject() throws IOException {
+        JsonToken jsonToken = parser.nextToken();
+        while (jsonToken != JsonToken.END_OBJECT) {
+            jsonToken = parser.nextToken();
+        }
+    }
+
     private void consumeJsonToken(String fieldName,
                                   JsonToken valueToken,
                                   int vectorIndex,
@@ -153,16 +161,20 @@ public class JsonToArrowVectorIterator2 implements Iterator<VectorSchemaRoot>, A
                 throw new IllegalStateException("must be value token");
             case VALUE_STRING:
                 ((VarCharVector) consumerVector).set(vectorIndex, new Text(parser.getText()));
+                consumerVector.setValueCount(1);
                 break;
             case VALUE_FALSE:
             case VALUE_TRUE:
                 ((BitVector) consumerVector).set(vectorIndex, parser.getBooleanValue() ? 1 : 0);
+                consumerVector.setValueCount(1);
                 break;
             case VALUE_NUMBER_INT:
                 ((IntVector) consumerVector).set(vectorIndex, parser.getIntValue());
+                consumerVector.setValueCount(1);
                 break;
             case VALUE_NUMBER_FLOAT:
                 ((Float4Vector) consumerVector).set(vectorIndex, parser.getFloatValue());
+                consumerVector.setValueCount(1);
                 break;
             case VALUE_NULL:
                 break;

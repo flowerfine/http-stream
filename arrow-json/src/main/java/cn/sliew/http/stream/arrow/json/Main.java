@@ -6,15 +6,20 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.ipc.ArrowStreamWriter;
+import org.apache.arrow.vector.ipc.JsonFileWriter;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("user.json");
+
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectReader reader = objectMapper.reader();
         JsonParser parser = reader.createParser(inputStream);
@@ -24,12 +29,12 @@ public class Main {
 
         while (iterator.hasNext()) {
             VectorSchemaRoot vectorSchemaRoot = iterator.next();
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            final ArrowStreamWriter arrowStreamWriter = new ArrowStreamWriter(vectorSchemaRoot, jsonToArrowConfig.getProvider(), outputStream);
-            arrowStreamWriter.start();
-            arrowStreamWriter.writeBatch();
-            arrowStreamWriter.close();
-            System.out.println(outputStream);
+            URL data = Main.class.getClassLoader().getResource("data.json");
+            System.out.println(data.getPath());
+            JsonFileWriter jsonFileWriter = new JsonFileWriter(new File(data.toURI()));
+            jsonFileWriter.start(vectorSchemaRoot.getSchema(), jsonToArrowConfig.getProvider());
+            jsonFileWriter.write(vectorSchemaRoot);
+            jsonFileWriter.close();
             System.out.println("输出转化结果! 数量: " + vectorSchemaRoot.getRowCount());
         }
 
