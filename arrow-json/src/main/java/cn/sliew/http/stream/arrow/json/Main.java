@@ -8,11 +8,11 @@ import org.apache.arrow.vector.VectorSchemaRoot;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class Main2 {
+public class Main {
 
     public static void main(String[] args) throws IOException {
-        InputStream inputStream1 = Main2.class.getClassLoader().getResourceAsStream("user.json");
-        InputStream inputStream2 = Main2.class.getClassLoader().getResourceAsStream("data.json");
+        InputStream inputStream1 = Main.class.getClassLoader().getResourceAsStream("user.json");
+        InputStream inputStream2 = Main.class.getClassLoader().getResourceAsStream("data.json");
 
         ObjectMapper mapper = new ObjectMapper();
         final JsonNode jsonNode = mapper.readTree(inputStream1);
