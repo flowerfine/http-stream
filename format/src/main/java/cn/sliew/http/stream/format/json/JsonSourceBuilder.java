@@ -9,6 +9,6 @@ public class JsonSourceBuilder {
     private String path;
 
     public Source<VectorSchemaRoot, NotUsed> build() {
-
+        return null;
     }
 }

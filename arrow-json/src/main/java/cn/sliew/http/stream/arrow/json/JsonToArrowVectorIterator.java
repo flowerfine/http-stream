@@ -191,7 +191,7 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
 
             listVector.startNewValue(vectorIndex);
             int count = 0;
-            for (final JsonNode node : arrayNode) {
+            for (JsonNode node : arrayNode) {
                 consumerRawNodeValue(count++, fieldName, elementField, listVector.getDataVector(), node);
             }
             listVector.endValue(vectorIndex, (int) totalCount);
