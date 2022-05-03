@@ -17,8 +17,9 @@ import org.apache.arrow.vector.util.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, AutoCloseable {
 
@@ -182,20 +183,16 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
             int count = 0;
 
             final List<Field> children = field.getChildren();
-            if (children.size() == 0) {
-
-
-            } else {
-                final Field elementField = children.get(0);
-                ListVector listVector = (ListVector) fieldVector;
-                listVector.startNewValue(vectorIndex);
-                long totalCount = 0;
-                for (final JsonNode node : arrayNode) {
-                    getRawNodeValue(count++, fieldName, elementField, node);
-                }
-                listVector.endValue(vectorIndex, (int) totalCount);
-                return listVector;
+            final Field elementField = children.get(0);
+            ListVector listVector = (ListVector) fieldVector;
+            listVector.startNewValue(vectorIndex);
+            long totalCount = 0;
+            for (final JsonNode node : arrayNode) {
+                getRawNodeValue(count++, fieldName, elementField, node);
             }
+            listVector.endValue(vectorIndex, (int) totalCount);
+            return listVector;
+
         }
 
         if (fieldNode.isObject()) {
@@ -204,7 +201,7 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
             int childVectorIndex = 0;
             for (Field childField : children) {
                 final JsonNode childJsonNode = fieldNode.get(childField.getName());
-               getRawNodeValue(childVectorIndex++, childField.getName(), childField, childJsonNode);
+                getRawNodeValue(childVectorIndex++, childField.getName(), childField, childJsonNode);
             }
             structVector.setIndexDefined(vectorIndex);
             return structVector;

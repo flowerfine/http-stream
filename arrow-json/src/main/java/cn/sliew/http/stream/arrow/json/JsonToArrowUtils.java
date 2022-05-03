@@ -54,11 +54,13 @@ public enum JsonToArrowUtils {
                         throw new IllegalStateException("can't infer fieldType from empty array for " + fieldName);
                     }
                     final JsonNode childFieldValue = fieldValue.get(0);
-                    if (childFieldValue.isContainerNode()) {
+                    if (childFieldValue.isObject()) {
+                        FieldType objectFieldType = FieldType.notNullable(ArrowType.Struct.INSTANCE);
                         Schema childArraySchema = inferSchema(childFieldValue);
-                        fields.add(new Field(fieldName, fieldType, childArraySchema.getFields()));
+                        Field objectField = new Field(null, objectFieldType, childArraySchema.getFields());
+                        fields.add(new Field(fieldName, fieldType, Collections.singletonList(objectField)));
                     } else {
-                        Field field = inferValueField(fieldName, childFieldValue);
+                        Field field = inferValueField(null, childFieldValue);
                         fields.add(new Field(fieldName, fieldType, Collections.singletonList(field)));
                     }
                     break;
