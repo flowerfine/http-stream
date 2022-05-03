@@ -34,6 +34,11 @@
             <artifactId>jackson-module-jsonSchema</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.sliew</groupId>
+            <artifactId>milky-common</artifactId>
+        </dependency>
+
         <!--<dependency>
             <groupId>com.github.saasquatch</groupId>
             <artifactId>json-schema-inferrer</artifactId>

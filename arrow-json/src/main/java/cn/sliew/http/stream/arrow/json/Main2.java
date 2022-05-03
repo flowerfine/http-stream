@@ -12,7 +12,7 @@ public class Main2 {
 
     public static void main(String[] args) throws IOException {
         InputStream inputStream1 = Main2.class.getClassLoader().getResourceAsStream("user.json");
-        InputStream inputStream2 = Main2.class.getClassLoader().getResourceAsStream("user.json");
+        InputStream inputStream2 = Main2.class.getClassLoader().getResourceAsStream("data.json");
 
         ObjectMapper mapper = new ObjectMapper();
         final JsonNode jsonNode = mapper.readTree(inputStream1);
@@ -23,6 +23,5 @@ public class Main2 {
             final VectorSchemaRoot next = iterator.next();
             System.out.println(next);
         }
-
     }
 }

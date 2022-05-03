@@ -1,5 +1,6 @@
 package cn.sliew.http.stream.arrow.json;
 
+import cn.sliew.milky.common.exception.Rethrower;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -23,7 +24,6 @@ import java.util.List;
 public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, AutoCloseable {
 
     public static final int NO_LIMIT_BATCH_SIZE = -1;
-    public static final int DEFAULT_BATCH_SIZE = 1024;
 
     private static final JsonFactory jsonFactory = new JsonFactory();
     private static final ObjectMapper codec = new ObjectMapper();
@@ -35,10 +35,9 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
     private Schema rootSchema;
     private JsonParser jsonParser;
     private JsonNode firstJsonNode;
+    private JsonNode nextJsonNode;
 
     private boolean firstObjectConsumed = false;
-
-    private final int targetBatchSize;
 
     JsonToArrowVectorIterator(
             String originalJsonData,
@@ -48,7 +47,6 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
         this.originalJsonData = originalJsonData;
         this.in = in;
         this.config = config;
-        this.targetBatchSize = config.getTargetBatchSize();
 
         jsonParser = jsonFactory.createParser(in);
         jsonParser.setCodec(codec);
@@ -58,7 +56,6 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
 
     private void initialize() throws IOException {
         this.rootSchema = JsonToArrowUtils.inferSchema(originalJsonData);
-        System.out.println(rootSchema.toJson());
     }
 
     private void moveToObject() throws IOException {
@@ -76,19 +73,31 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
 
     @Override
     public boolean hasNext() {
-        return jsonParser.isClosed() == false;
+        if (firstObjectConsumed == false) {
+            return firstJsonNode != null;
+        }
+        if (jsonParser.isClosed()) {
+            return false;
+        }
+        try {
+            this.nextJsonNode = getJsonNode();
+            return nextJsonNode != null;
+        } catch (IOException e) {
+            Rethrower.throwAs(e);
+            // never go here
+            return false;
+        }
     }
 
     @Override
     public VectorSchemaRoot next() {
         try {
-            Preconditions.checkArgument(hasNext());
             final JsonNode nextJsonNode = getNextJsonNode();
             return convertJsonNodeToVector(nextJsonNode);
         } catch (IOException e) {
-            e.printStackTrace();
+            Rethrower.throwAs(e);
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -102,7 +111,7 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
             return firstJsonNode;
         }
 
-        return getJsonNode();
+        return nextJsonNode;
     }
 
     private JsonNode getJsonNode() throws IOException {
@@ -113,7 +122,6 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
             }
 
             switch (token) {
-                case START_ARRAY:
                 case END_ARRAY:
                 case END_OBJECT:
                     break;
@@ -132,68 +140,71 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
             final Field field = fields.get(i);
             final String fieldName = field.getName();
             final JsonNode childNode = jsonNode.get(fieldName);
-            final FieldVector fieldVector = getRawNodeValue(i, fieldName, field, childNode);
+            final FieldVector fieldVector = consumerRawNodeValue(i, fieldName, field, null, childNode);
             fieldVectors.add(fieldVector);
         }
         return new VectorSchemaRoot(rootSchema, fieldVectors, 1);
     }
 
-    private FieldVector getRawNodeValue(int vectorIndex, String fieldName, Field field, final JsonNode fieldNode) throws IOException {
+    private FieldVector consumerRawNodeValue(int vectorIndex, String fieldName, Field field, FieldVector consumerVector, JsonNode fieldNode) throws IOException {
         if (fieldNode == null || fieldNode.isNull()) {
             return null;
         }
 
-        final FieldVector fieldVector = field.getFieldType().createNewSingleVector(fieldName, config.getAllocator(), null);
-        fieldVector.allocateNew();
-
         if (fieldNode.isNumber()) {
-            Float8Vector float8Vector = (Float8Vector) fieldVector;
+            Float8Vector float8Vector = (Float8Vector) JsonToArrowUtils.createVector(fieldName, field.getFieldType(), consumerVector, config.getAllocator());
+            float8Vector.allocateNew();
             float8Vector.set(vectorIndex, fieldNode.doubleValue());
             return float8Vector;
         }
 
         if (fieldNode.isBinary()) {
-            VarBinaryVector varBinaryVector = (VarBinaryVector) fieldVector;
+            VarBinaryVector varBinaryVector = (VarBinaryVector) JsonToArrowUtils.createVector(fieldName, field.getFieldType(), consumerVector, config.getAllocator());
+            varBinaryVector.allocateNew();
             varBinaryVector.set(vectorIndex, fieldNode.binaryValue());
             return varBinaryVector;
         }
 
         if (fieldNode.isBoolean()) {
-            BitVector bitVector = (BitVector) fieldVector;
+            BitVector bitVector = (BitVector) JsonToArrowUtils.createVector(fieldName, field.getFieldType(), consumerVector, config.getAllocator());
+            bitVector.allocateNew();
             bitVector.set(vectorIndex, fieldNode.booleanValue() ? 1 : 0);
             return bitVector;
         }
 
         if (fieldNode.isTextual()) {
-            VarCharVector varCharVector = (VarCharVector) fieldVector;
+            VarCharVector varCharVector = (VarCharVector) JsonToArrowUtils.createVector(fieldName, field.getFieldType(), consumerVector, config.getAllocator());
+            varCharVector.allocateNew();
             varCharVector.set(vectorIndex, new Text(fieldNode.textValue()));
             return varCharVector;
         }
 
         if (fieldNode.isArray()) {
             final ArrayNode arrayNode = (ArrayNode) fieldNode;
-            int count = 0;
+            long totalCount = arrayNode.size();
 
-            final List<Field> children = field.getChildren();
-            final Field elementField = children.get(0);
-            ListVector listVector = (ListVector) fieldVector;
+            final Field elementField = field.getChildren().get(0);
+            ListVector listVector = (ListVector) field.createVector(config.getAllocator());
+            if (listVector.getDataVector().getValueCapacity() < totalCount) {
+                listVector.getDataVector().reAlloc();
+            }
+
             listVector.startNewValue(vectorIndex);
-            long totalCount = 0;
+            int count = 0;
             for (final JsonNode node : arrayNode) {
-                getRawNodeValue(count++, fieldName, elementField, node);
+                consumerRawNodeValue(count++, fieldName, elementField, listVector.getDataVector(), node);
             }
             listVector.endValue(vectorIndex, (int) totalCount);
             return listVector;
-
         }
 
         if (fieldNode.isObject()) {
             final List<Field> children = field.getChildren();
-            StructVector structVector = (StructVector) fieldVector;
+            StructVector structVector = (StructVector) field.createVector(config.getAllocator());
             int childVectorIndex = 0;
             for (Field childField : children) {
                 final JsonNode childJsonNode = fieldNode.get(childField.getName());
-                getRawNodeValue(childVectorIndex++, childField.getName(), childField, childJsonNode);
+                consumerRawNodeValue(childVectorIndex++, childField.getName(), childField, null, childJsonNode);
             }
             structVector.setIndexDefined(vectorIndex);
             return structVector;

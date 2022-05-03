@@ -3,6 +3,10 @@ package cn.sliew.http.stream.arrow.json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import io.netty.util.internal.StringUtil;
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.vector.FieldVector;
+import org.apache.arrow.vector.types.Types;
 import org.apache.arrow.vector.types.pojo.ArrowType;
 import org.apache.arrow.vector.types.pojo.Field;
 import org.apache.arrow.vector.types.pojo.FieldType;
@@ -44,12 +48,12 @@ public enum JsonToArrowUtils {
                     fields.add(inferValueField(fieldName, fieldValue));
                     break;
                 case OBJECT:
-                    fieldType = FieldType.notNullable(ArrowType.Struct.INSTANCE);
+                    fieldType = FieldType.nullable(ArrowType.Struct.INSTANCE);
                     final Schema childObjectSchema = inferSchema(fieldValue);
                     fields.add(new Field(fieldName, fieldType, childObjectSchema.getFields()));
                     break;
                 case ARRAY:
-                    fieldType = FieldType.notNullable(ArrowType.List.INSTANCE);
+                    fieldType = FieldType.nullable(ArrowType.List.INSTANCE);
                     if (fieldValue.size() == 0) {
                         throw new IllegalStateException("can't infer fieldType from empty array for " + fieldName);
                     }
@@ -75,20 +79,20 @@ public enum JsonToArrowUtils {
 
     private static Field inferValueField(String fieldName, JsonNode fieldValue) {
         final JsonNodeType nodeType = fieldValue.getNodeType();
-        FieldType fieldType = null;
+        ArrowType arrowType = null;
         switch (nodeType) {
             case STRING:
-                fieldType = FieldType.notNullable(ArrowType.Utf8.INSTANCE);
-                return new Field(fieldName, fieldType, null);
+                arrowType = ArrowType.Utf8.INSTANCE;
+                break;
             case BOOLEAN:
-                fieldType = FieldType.notNullable(ArrowType.Bool.INSTANCE);
-                return new Field(fieldName, fieldType, null);
+                arrowType = ArrowType.Bool.INSTANCE;
+                break;
             case NUMBER:
-                fieldType = FieldType.notNullable(new ArrowType.FloatingPoint(DOUBLE));
-                return new Field(fieldName, fieldType, null);
+                arrowType = new ArrowType.FloatingPoint(DOUBLE);
+                break;
             case BINARY:
-                fieldType = FieldType.notNullable(ArrowType.Binary.INSTANCE);
-                return new Field(fieldName, fieldType, null);
+                arrowType = ArrowType.Binary.INSTANCE;
+                break;
             case NULL:
                 throw new IllegalStateException("can't infer fieldType from null for " + fieldName);
             case ARRAY:
@@ -99,5 +103,21 @@ public enum JsonToArrowUtils {
             default:
                 throw new IllegalStateException("unknown json node type for " + fieldName + " with " + nodeType);
         }
+        FieldType fieldType = FieldType.nullable(arrowType);
+        if (StringUtil.isNullOrEmpty(fieldName)) {
+            fieldName = getDefaultFieldName(arrowType);
+        }
+        return new Field(fieldName, fieldType, null);
+    }
+
+    static FieldVector createVector(String name, FieldType fieldType,
+                                            FieldVector consumerVector,
+                                            BufferAllocator allocator) {
+        return consumerVector != null ? consumerVector : fieldType.createNewSingleVector(name, allocator, null);
+    }
+
+    private static String getDefaultFieldName(ArrowType type) {
+        Types.MinorType minorType = Types.getMinorTypeForArrowType(type);
+        return minorType.name().toLowerCase();
     }
 }
