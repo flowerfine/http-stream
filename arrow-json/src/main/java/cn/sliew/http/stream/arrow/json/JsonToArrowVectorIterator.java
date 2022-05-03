@@ -1,6 +1,5 @@
 package cn.sliew.http.stream.arrow.json;
 
-import cn.sliew.http.stream.arrow.json.consumer.CompositeJsonConsumer;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -33,10 +32,7 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
     private final InputStream in;
     private final JsonToArrowConfig config;
 
-    private CompositeJsonConsumer compositeConsumer;
     private Schema rootSchema;
-    private VectorSchemaRoot nextBatch;
-
     private JsonParser jsonParser;
     private JsonNode firstJsonNode;
 
@@ -97,10 +93,6 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
 
     @Override
     public void close() throws Exception {
-        if (nextBatch != null) {
-            nextBatch.close();
-        }
-        compositeConsumer.close();
         jsonParser.close();
     }
 
