@@ -38,10 +38,10 @@ public class JsonConsumer implements Consumer<VectorSchemaRoot> {
                 for (Field field : schema.getFields()) {
                     FieldVector vector = vectorSchemaRoot.getVector(field.getName());
                     consume(i, field, vector);
-                    generator.flush();
                 }
                 generator.writeEndObject();
             }
+            generator.flush();
         } catch (IOException e) {
             Rethrower.throwAs(e);
         }
@@ -128,7 +128,7 @@ public class JsonConsumer implements Consumer<VectorSchemaRoot> {
             ListVector listVector = (ListVector) fieldVector;
             generator.writeArrayFieldStart(field.getName());
             FieldVector dataVector = listVector.getDataVector();
-            for (int i = 0; i < dataVector.getValueCapacity(); i++) {
+            for (int i = 0; i < listVector.getValueCount(); i++) {
                 consumeFieldVector(i, dataVector);
             }
             generator.writeEndArray();
