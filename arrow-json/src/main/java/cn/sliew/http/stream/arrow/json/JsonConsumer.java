@@ -244,7 +244,6 @@ public class JsonConsumer implements Consumer<VectorSchemaRoot> {
         } else if (fieldVector instanceof StructVector) {
             StructVector structVector = (StructVector) fieldVector;
             generator.writeStartObject();
-            int childVectorIndex = 0;
             List<String> childFieldNames = structVector.getChildFieldNames();
             for (String childFieldName : childFieldNames) {
                 FieldVector childFieldVector = structVector.getChild(childFieldName);
