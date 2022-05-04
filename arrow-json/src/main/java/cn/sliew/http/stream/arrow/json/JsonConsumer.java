@@ -248,6 +248,8 @@ public class JsonConsumer implements Consumer<VectorSchemaRoot> {
             List<String> childFieldNames = structVector.getChildFieldNames();
             for (String childFieldName : childFieldNames) {
                 FieldVector childFieldVector = structVector.getChild(childFieldName);
+                // fixme 嵌套
+                generator.writeFieldName(childFieldName);
                 consumeFieldVector(childVectorIndex++, childFieldVector);
             }
             generator.writeEndObject();

@@ -207,7 +207,12 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
 
         if (fieldNode.isObject()) {
             final List<Field> children = field.getChildren();
-            StructVector structVector = (StructVector) field.createVector(config.getAllocator());
+            StructVector structVector;
+            if (consumerVector != null) {
+                structVector = (StructVector) consumerVector;
+            } else {
+                structVector = (StructVector) field.createVector(config.getAllocator());
+            }
             int childVectorIndex = 0;
             for (Field childField : children) {
                 final JsonNode childJsonNode = fieldNode.get(childField.getName());
