@@ -135,12 +135,10 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
 
     private VectorSchemaRoot convertJsonNodeToVector(JsonNode jsonNode) throws IOException {
         List<FieldVector> fieldVectors = new ArrayList<>();
-        final List<Field> fields = rootSchema.getFields();
-        for (int i = 0; i < fields.size(); i++) {
-            final Field field = fields.get(i);
+        for (Field field : rootSchema.getFields()) {
             final String fieldName = field.getName();
             final JsonNode childNode = jsonNode.get(fieldName);
-            final FieldVector fieldVector = consumerRawNodeValue(i, fieldName, field, null, childNode);
+            final FieldVector fieldVector = consumerRawNodeValue(0, fieldName, field, null, childNode);
             fieldVectors.add(fieldVector);
         }
         return new VectorSchemaRoot(rootSchema, fieldVectors, 1);
@@ -153,28 +151,36 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
 
         if (fieldNode.isNumber()) {
             Float8Vector float8Vector = (Float8Vector) JsonToArrowUtils.createVector(fieldName, field.getFieldType(), consumerVector, config.getAllocator());
-            float8Vector.allocateNew();
+            while (float8Vector.getValueCapacity() < vectorIndex + 1) {
+                float8Vector.reAlloc();
+            }
             float8Vector.set(vectorIndex, fieldNode.doubleValue());
             return float8Vector;
         }
 
         if (fieldNode.isBinary()) {
-            VarBinaryVector varBinaryVector = (VarBinaryVector) JsonToArrowUtils.createVector(fieldName, field.getFieldType(), consumerVector, config.getAllocator());
-            varBinaryVector.allocateNew();
+            VarBinaryVector varBinaryVector =(VarBinaryVector) JsonToArrowUtils.createVector(fieldName, field.getFieldType(), consumerVector, config.getAllocator());
+            while (varBinaryVector.getValueCapacity() < vectorIndex + 1) {
+                varBinaryVector.reAlloc();
+            }
             varBinaryVector.set(vectorIndex, fieldNode.binaryValue());
             return varBinaryVector;
         }
 
         if (fieldNode.isBoolean()) {
             BitVector bitVector = (BitVector) JsonToArrowUtils.createVector(fieldName, field.getFieldType(), consumerVector, config.getAllocator());
-            bitVector.allocateNew();
+            while (bitVector.getValueCapacity() < vectorIndex + 1) {
+                bitVector.reAlloc();
+            }
             bitVector.set(vectorIndex, fieldNode.booleanValue() ? 1 : 0);
             return bitVector;
         }
 
         if (fieldNode.isTextual()) {
-            VarCharVector varCharVector = (VarCharVector) JsonToArrowUtils.createVector(fieldName, field.getFieldType(), consumerVector, config.getAllocator());
-            varCharVector.allocateNew();
+            VarCharVector varCharVector =(VarCharVector) JsonToArrowUtils.createVector(fieldName, field.getFieldType(), consumerVector, config.getAllocator());
+            while (varCharVector.getValueCapacity() < vectorIndex + 1) {
+                varCharVector.reAlloc();
+            }
             varCharVector.set(vectorIndex, new Text(fieldNode.textValue()));
             return varCharVector;
         }
@@ -204,7 +210,9 @@ public class JsonToArrowVectorIterator implements Iterator<VectorSchemaRoot>, Au
             int childVectorIndex = 0;
             for (Field childField : children) {
                 final JsonNode childJsonNode = fieldNode.get(childField.getName());
-                consumerRawNodeValue(childVectorIndex++, childField.getName(), childField, null, childJsonNode);
+                final FieldVector valueVector = structVector.getChildrenFromFields().get(childVectorIndex);
+                consumerRawNodeValue(vectorIndex, childField.getName(), childField, valueVector, childJsonNode);
+                childVectorIndex++;
             }
             structVector.setIndexDefined(vectorIndex);
             return structVector;
