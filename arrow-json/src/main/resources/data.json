@@ -1,0 +1,22 @@
+{
+  "name": "wangqi",
+  "age": 1,
+  "enabled": true,
+  "salary": 101.8,
+  "contact": "1525219136",
+  "location": {
+    "province": "zhejiang",
+    "city": "hangzhou"
+  },
+  "tags": ["man", "new"],
+  "products": [
+    {
+      "title": "http-stream",
+      "timestamp": 11
+    },
+    {
+      "title": "flinkful",
+      "timestamp": 12
+    }
+  ]
+}

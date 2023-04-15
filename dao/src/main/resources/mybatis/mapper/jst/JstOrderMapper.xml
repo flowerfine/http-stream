@@ -84,13 +84,13 @@
     <select id="selectByOId" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from jst_orders_single_api
+        from jst_order
         where o_id = #{oId}
     </select>
 
     <insert id="insertSelective"
             parameterType="cn.sliew.http.stream.dao.entity.jst.JstOrder">
-        insert into jst_orders_single_api
+        insert into jst_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="isCod != null">
                 is_cod,
@@ -459,7 +459,7 @@
 
     <update id="updateByPrimaryKeySelective"
             parameterType="cn.sliew.http.stream.dao.entity.jst.JstOrder">
-        update jst_orders_single_api
+        update jst_order
         <set>
             <if test="isCod != null">
                 is_cod = #{isCod},

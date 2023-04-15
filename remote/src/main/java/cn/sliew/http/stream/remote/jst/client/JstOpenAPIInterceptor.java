@@ -3,23 +3,23 @@ package cn.sliew.http.stream.remote.jst.client;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
 import java.util.Collection;
 import java.util.Map;
 
 @Slf4j
-@Component
 public class JstOpenAPIInterceptor implements RequestInterceptor {
 
-    @Value("${jst.partnerId}")
-    protected String partnerId;
-    @Value("${jst.token}")
-    protected String token;
-    @Value("${jst.partnerKey}")
-    protected String partnerKey;
+    private final String partnerId;
+    private final String token;
+    private final String partnerKey;
+
+    public JstOpenAPIInterceptor(String partnerId, String token, String partnerKey) {
+        this.partnerId = partnerId;
+        this.token = token;
+        this.partnerKey = partnerKey;
+    }
 
     private String sign(String method, String ts) {
         String toSign = String.format("%s%stoken%sts%s%s", method, partnerId, token, ts, partnerKey);

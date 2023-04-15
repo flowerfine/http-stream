@@ -1,11 +1,17 @@
 package cn.sliew.http.stream.akka.framework;
 
-public interface JobContext<SyncOffset, Root extends RootTask, Sub extends SubTask> {
+import akka.actor.typed.ActorSystem;
+import io.micrometer.core.instrument.MeterRegistry;
+
+import java.util.Properties;
+
+public interface JobContext<Root extends RootTask, Sub extends SubTask> {
 
     String getJobName();
 
-    SyncOffset getSyncOffset(Root rootTask);
+    Properties getProperties();
 
-    void updateSyncOffset(Sub subTask);
+    MeterRegistry getMetrics();
 
+    ActorSystem getActorSystem();
 }
